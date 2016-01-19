@@ -27,5 +27,9 @@ define(function (require, exports, module) {
     return this.lines.join('\n');
   };
 
+  CodeWriter.prototype.fileName = function (className) {
+    return className.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+  };
+
   exports.CodeWriter = CodeWriter;
 });
