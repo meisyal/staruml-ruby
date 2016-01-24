@@ -91,16 +91,37 @@ define(function (require, exports, module) {
     }
   };
 
+  RubyCodeGenerator.prototype.writeSetGetMethod = function (codeWriter, element, options) {
+    if (element.name.length) {
+      var len = element.attributes.length;
+
+      for (var i = 0; i < len; i++) {
+        codeWriter.writeLine('def ' + element.attributes[i].name);
+        codeWriter.indent();
+        codeWriter.writeLine('@' + element.attributes[i].name);
+        codeWriter.outdent();
+        codeWriter.writeLine('end');
+        codeWriter.writeLine();
+        codeWriter.writeLine('def ' + element.attributes[i].name + '=(value)');
+        codeWriter.indent();
+        codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
+        codeWriter.outdent();
+        codeWriter.writeLine('end');
+        codeWriter.writeLine();
+      }
+    }
+  };
+
   RubyCodeGenerator.prototype.writeClass = function (codeWriter, element, options) {
     var terms = [];
 
     terms.push('class');
     terms.push(element.name);
-
     codeWriter.writeLine(terms.join(' '));
     codeWriter.indent();
-
     this.writeConstructor(codeWriter, element, options);
+    codeWriter.writeLine();
+    this.writeSetGetMethod(codeWriter, element, options);
     codeWriter.outdent();
     codeWriter.writeLine('end');
   };
