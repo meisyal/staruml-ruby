@@ -107,8 +107,35 @@ define(function (require, exports, module) {
         codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
         codeWriter.outdent();
         codeWriter.writeLine('end');
-        codeWriter.writeLine();
+        if (i !== len - 1) {
+          codeWriter.writeLine();
+        }
       }
+    }
+  };
+
+  RubyCodeGenerator.prototype.writeMethod = function (codeWriter, element, options) {
+    if (element.name.length) {
+      var terms = [];
+      var parameters = element.getNonReturnParameters();
+      var len = parameters.length;
+
+      terms.push('def ' + element.name);
+      if (len !== 0) {
+        terms.push('(');
+        for (var i = 0; i < len; i++) {
+          terms.push(parameters[i].name);
+          if (i !== len - 1) {
+            terms.push(', ');
+          }
+        }
+
+        codeWriter.writeLine(terms.join('') + ')');
+      } else {
+        codeWriter.writeLine(terms.join(''));
+      }
+
+      codeWriter.writeLine('end');
     }
   };
 
@@ -122,6 +149,16 @@ define(function (require, exports, module) {
     this.writeConstructor(codeWriter, element, options);
     codeWriter.writeLine();
     this.writeSetGetMethod(codeWriter, element, options);
+
+    var len = element.operations.length;
+
+    for (var i = 0; i < len; i++) {
+      this.writeMethod(codeWriter, element.operations[i], options);
+      if (i !== len - 1) {
+        codeWriter.writeLine();
+      }
+    }
+
     codeWriter.outdent();
     codeWriter.writeLine('end');
   };
