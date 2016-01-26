@@ -56,7 +56,7 @@ define(function (require, exports, module) {
         codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
         codeWriter.writeLine();
         this.writeClass(codeWriter, element, options);
-        fullPath = path + '/' + element.name + '.rb';
+        fullPath = path + '/' + codeWriter.fileName(element.name) + '.rb';
         file = FileSystem.getFileForPath(fullPath);
         FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
       }
