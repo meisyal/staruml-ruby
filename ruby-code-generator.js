@@ -148,20 +148,27 @@ define(function (require, exports, module) {
 
       terms += '\n';
       terms += '  end';
-      terms += '\n\n';
     }
 
     return terms;
   }
 
   RubyCodeGenerator.prototype.writeMethod = function (codeWriter, publicTerms, protectedTerms, privateTerms) {
-    codeWriter.writeLine(publicTerms);
-    codeWriter.writeLine('  protected');
-    codeWriter.writeLine();
-    codeWriter.writeLine(protectedTerms);
-    codeWriter.writeLine('  private');
-    codeWriter.writeLine();
-    codeWriter.writeLine(privateTerms);
+    if (publicTerms.length) {
+      codeWriter.writeLine(publicTerms);
+    }
+
+    if (protectedTerms.length) {
+      codeWriter.writeLine('  protected');
+      codeWriter.writeLine();
+      codeWriter.writeLine(protectedTerms);
+    }
+
+    if (privateTerms.length) {
+      codeWriter.writeLine('  private');
+      codeWriter.writeLine();
+      codeWriter.writeLine(privateTerms);
+    }
   };
 
   RubyCodeGenerator.prototype.writeClass = function (codeWriter, element, options) {
@@ -186,12 +193,25 @@ define(function (require, exports, module) {
       var methodVisibility = this.getVisibility(element.operations[i]);
       var methodString = this.constructMethod(codeWriter, element.operations[i], options);
 
-      if (methodVisibility === 'public') {
-        publicTerms += methodString;
-      } else if (methodVisibility === 'protected') {
-        protectedTerms += methodString;
-      } else if (methodVisibility === 'private') {
-        privateTerms += methodString;
+      if (i !== len - 1) {
+        if (methodVisibility === 'public') {
+          publicTerms += methodString;
+          publicTerms += '\n\n';
+        } else if (methodVisibility === 'protected') {
+          protectedTerms += methodString;
+          protectedTerms += '\n\n';
+        } else if (methodVisibility === 'private') {
+          privateTerms += methodString;
+          privateTerms += '\n\n';
+        }
+      } else {
+        if (methodVisibility === 'public') {
+          publicTerms += methodString;
+        } else if (methodVisibility === 'protected') {
+          protectedTerms += methodString;
+        } else if (methodVisibility === 'private') {
+          privateTerms += methodString;
+        }
       }
     }
 
