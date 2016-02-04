@@ -1,6 +1,7 @@
 define(function (require, exports, module) {
   'use strict';
 
+  var Repository = app.getModule('core/Repository');
   var ProjectManager = app.getModule('engine/ProjectManager');
   var Engine = app.getModule('engine/Engine');
   var FileSystem = app.getModule('filesystem/FileSystem');
@@ -80,6 +81,15 @@ define(function (require, exports, module) {
     return null;
   };
 
+  RubyCodeGenerator.prototype.getSuperClasses = function (element) {
+    var inheritances = Repository.getRelationshipsOf(element, function (relationship) {
+      return (relationship instanceof type.UMLGeneralization && relationship.source === element);
+    });
+    return _.map(inheritances, function (inherit) {
+      return inherit.target;
+    });
+  };
+
   RubyCodeGenerator.prototype.writeConstructor = function (codeWriter, element, options) {
     if (element.name.length) {
       var terms = [];
@@ -104,7 +114,7 @@ define(function (require, exports, module) {
     }
   };
 
-  RubyCodeGenerator.prototype.writeSetGetMethod = function (codeWriter, element, options) {
+  RubyCodeGenerator.prototype.writeAttributeAccessor = function (codeWriter, element, options) {
     if (element.name.length) {
       var len = element.attributes.length;
 
@@ -176,11 +186,17 @@ define(function (require, exports, module) {
 
     terms.push('class');
     terms.push(element.name);
+
+    var _inheritance = this.getSuperClasses(element);
+    if (_inheritance.length) {
+      terms.push('< ' + _inheritance[0].name);
+    }
+
     codeWriter.writeLine(terms.join(' '));
     codeWriter.indent();
     this.writeConstructor(codeWriter, element, options);
     codeWriter.writeLine();
-    this.writeSetGetMethod(codeWriter, element, options);
+    this.writeAttributeAccessor(codeWriter, element, options);
     codeWriter.outdent();
     codeWriter.writeLine();
 
