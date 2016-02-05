@@ -141,6 +141,7 @@ define(function (require, exports, module) {
     if (element.name.length) {
       var parameters = element.getNonReturnParameters();
       var len = parameters.length;
+      var methodVisibility = this.getVisibility(element);
       var terms = '';
 
       terms += '  def ' + element.name;
@@ -157,7 +158,11 @@ define(function (require, exports, module) {
       }
 
       terms += '\n';
-      terms += '  end';
+      if (methodVisibility === 'public') {
+        terms += '  end';
+      } else {
+        terms += '    end';
+      }
     }
 
     return terms;
@@ -169,15 +174,19 @@ define(function (require, exports, module) {
     }
 
     if (protectedTerms.length) {
-      codeWriter.writeLine('  protected');
+      codeWriter.indent();
+      codeWriter.writeLine('protected');
       codeWriter.writeLine();
       codeWriter.writeLine(protectedTerms);
+      codeWriter.outdent();
     }
 
     if (privateTerms.length) {
-      codeWriter.writeLine('  private');
+      codeWriter.indent();
+      codeWriter.writeLine('private');
       codeWriter.writeLine();
       codeWriter.writeLine(privateTerms);
+      codeWriter.outdent();
     }
   };
 
