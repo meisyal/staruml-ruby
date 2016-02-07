@@ -168,6 +168,16 @@ define(function (require, exports, module) {
     return terms;
   }
 
+  RubyCodeGenerator.prototype.writeToStringMethod = function () {
+    var terms = '';
+
+    terms += '  def to_s\n';
+    terms += '    \"{Your string representation of the object will be written here}\"\n';
+    terms += '  end';
+
+    return terms;
+  }
+
   RubyCodeGenerator.prototype.writeMethod = function (codeWriter, publicTerms, protectedTerms, privateTerms) {
     if (publicTerms.length) {
       codeWriter.writeLine(publicTerms);
@@ -188,6 +198,9 @@ define(function (require, exports, module) {
       codeWriter.writeLine(privateTerms);
       codeWriter.outdent();
     }
+
+    codeWriter.writeLine();
+    codeWriter.writeLine(this.writeToStringMethod());
   };
 
   RubyCodeGenerator.prototype.writeClass = function (codeWriter, element, options) {
