@@ -22,10 +22,21 @@ Follow these guidelines below.
 * choose `dev` branch as your target branch (don't choose `master` branch).
 * the pull request detail should be written for additional details.
 
+## Useful Links
+
+Here below are some useful links for developing StarUML extension.
+
+* [StarUML main page][staruml]
+* [StarUML developer's guide][starumldev]
+* [StarUML API reference][starumlapi]
+
 ## License
 
 By contributing your code, you agree to license your contribution under the terms
 of the [MIT License][license].
 
 [issuetracker]: https://github.com/meisyal/staruml-ruby/issues
+[staruml]: http://staruml.io
+[starumldev]: https://github.com/staruml/staruml-dev-docs/wiki
+[starumlapi]: http://starumldocs-7a0.kxcdn.com/2.0.0/api
 [license]: https://github.com/meisyal/staruml-ruby/blob/master/LICENSE
