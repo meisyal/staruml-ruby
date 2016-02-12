@@ -1,0 +1,18 @@
+{
+  "name": "meisyal.starumlruby",
+  "title": "Ruby",
+  "description": "Ruby code generation.",
+  "homepage": "https://github.com/meisyal/staruml-ruby",
+  "issues": "https://github.com/meisyal/staruml-ruby/issues",
+  "keywords": ["ruby"],
+  "version": "0.1.0",
+  "author": {
+    "name": "Andrias Meisyal",
+    "email": "andriasonline@gmail.com",
+    "url": "https://github.com/meisyal"
+  },
+  "license": "MIT",
+  "engines": {
+    "staruml": ">=2.0.0"
+  }
+}
