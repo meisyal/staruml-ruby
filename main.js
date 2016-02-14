@@ -10,9 +10,11 @@ define(function (require, exports, module) {
 
   var CodeGenUtils = require('code-generator-utils');
   var RubyCodeGenerator = require('ruby-code-generator');
+  var RubyPreferences = require('ruby-preferences');
 
   var CMD_RUBY = 'ruby';
   var CMD_RUBY_GENERATE = 'ruby.generate';
+  var CMD_RUBY_CONFIGURE = 'ruby.configure';
 
   function _handleGenerate(base, path, options) {
     var result = new $.Deferred();
@@ -49,10 +51,17 @@ define(function (require, exports, module) {
     return result.promise();
   }
 
+  function _handleConfigure() {
+    CommandManager.execute(Commands.FILE_PREFERENCES, RubyPreferences.getId());
+  }
+
   CommandManager.register('Ruby', CMD_RUBY, CommandManager.doNothing);
   CommandManager.register('Generate Code...', CMD_RUBY_GENERATE, _handleGenerate);
+  CommandManager.register('Configure...', CMD_RUBY_CONFIGURE, _handleConfigure);
 
   var menu = MenuManager.getMenu(Commands.TOOLS);
   var menuItem = menu.addMenuItem(CMD_RUBY);
   menuItem.addMenuItem(CMD_RUBY_GENERATE);
+  menuItem.addMenuDivider();
+  menuItem.addMenuItem(CMD_RUBY_CONFIGURE);
 });
