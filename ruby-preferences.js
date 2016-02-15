@@ -8,10 +8,26 @@ define(function (require, exports, module) {
   var preferenceId = 'ruby';
 
   var rubyPreferences = {
+    'ruby.gen': {
+      text: 'Ruby Code Generation',
+      type: 'Section',
+    },
+    'ruby.gen.toStringMethod': {
+      text: 'to_s method',
+      description: 'Generate to_s method.',
+      type: 'Check',
+      default: true,
+    }
   };
 
   function getId() {
     return preferenceId;
+  }
+
+  function getGenerateOptions() {
+    return {
+      rubyToStringMethod: PreferenceManager.get('ruby.gen.toStringMethod'),
+    };
   }
 
   AppInit.htmlReady(function () {
@@ -19,4 +35,5 @@ define(function (require, exports, module) {
   });
 
   exports.getId = getId;
+  exports.getGenerateOptions = getGenerateOptions;
 });
