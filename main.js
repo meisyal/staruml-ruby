@@ -18,6 +18,7 @@ define(function (require, exports, module) {
 
   function _handleGenerate(base, path, options) {
     var result = new $.Deferred();
+    options = options || RubyPreferences.getGenerateOptions();
 
     if (!base) {
       ElementPickerDialog.showDialog('Select a base model to generate codes', null, type.UMLPackage)

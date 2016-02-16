@@ -178,7 +178,7 @@ define(function (require, exports, module) {
     return terms;
   }
 
-  RubyCodeGenerator.prototype.writeMethod = function (codeWriter, publicTerms, protectedTerms, privateTerms) {
+  RubyCodeGenerator.prototype.writeMethod = function (codeWriter, publicTerms, protectedTerms, privateTerms, options) {
     if (publicTerms.length) {
       codeWriter.writeLine(publicTerms);
     }
@@ -200,7 +200,10 @@ define(function (require, exports, module) {
     }
 
     codeWriter.writeLine();
-    codeWriter.writeLine(this.writeToStringMethod());
+
+    if (options.rubyToStringMethod) {
+      codeWriter.writeLine(this.writeToStringMethod());
+    }
   };
 
   RubyCodeGenerator.prototype.writeClass = function (codeWriter, element, options) {
@@ -253,7 +256,7 @@ define(function (require, exports, module) {
       }
     }
 
-    this.writeMethod(codeWriter, publicTerms, protectedTerms, privateTerms);
+    this.writeMethod(codeWriter, publicTerms, protectedTerms, privateTerms, options);
     codeWriter.writeLine('end');
   };
 

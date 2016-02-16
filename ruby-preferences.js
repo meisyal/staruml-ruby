@@ -17,7 +17,13 @@ define(function (require, exports, module) {
       description: 'Generate to_s method.',
       type: 'Check',
       default: true,
-    }
+    },
+    'ruby.gen.useAttributeAccessor': {
+      text: 'Use attribute accessor',
+      description: 'Use attribute accessor rather than set and get attribute methods.',
+      type: 'Check',
+      default: false,
+    },
   };
 
   function getId() {
@@ -27,6 +33,7 @@ define(function (require, exports, module) {
   function getGenerateOptions() {
     return {
       rubyToStringMethod: PreferenceManager.get('ruby.gen.toStringMethod'),
+      useAttributeAccessor: PreferenceManager.get('ruby.gen.useAttributeAccessor'),
     };
   }
 
