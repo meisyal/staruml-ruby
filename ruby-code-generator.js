@@ -114,24 +114,40 @@ define(function (require, exports, module) {
     }
   };
 
-  RubyCodeGenerator.prototype.writeAttributeAccessor = function (codeWriter, element, options) {
+  RubyCodeGenerator.prototype.writeAttributeAccessor = function (type, codeWriter, element, options) {
+    var terms = [];
+
     if (element.name.length) {
+      var i;
       var len = element.attributes.length;
 
-      for (var i = 0; i < len; i++) {
-        codeWriter.writeLine('def ' + element.attributes[i].name);
-        codeWriter.indent();
-        codeWriter.writeLine('@' + element.attributes[i].name);
-        codeWriter.outdent();
-        codeWriter.writeLine('end');
+      if (type === 'short') {
+        terms.push('attr_accessor ');
+        for (i = 0; i < len; i++) {
+          terms.push(':' + element.attributes[i].name);
+          if (i !== len - 1) {
+            terms.push(', ');
+          }
+        }
+
+        codeWriter.writeLine(terms.join(''));
         codeWriter.writeLine();
-        codeWriter.writeLine('def ' + element.attributes[i].name + '=(value)');
-        codeWriter.indent();
-        codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
-        codeWriter.outdent();
-        codeWriter.writeLine('end');
-        if (i !== len - 1) {
+      } else if (type === 'long') {
+        for (i = 0; i < len; i++) {
+          codeWriter.writeLine('def ' + element.attributes[i].name);
+          codeWriter.indent();
+          codeWriter.writeLine('@' + element.attributes[i].name);
+          codeWriter.outdent();
+          codeWriter.writeLine('end');
           codeWriter.writeLine();
+          codeWriter.writeLine('def ' + element.attributes[i].name + '=(value)');
+          codeWriter.indent();
+          codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
+          codeWriter.outdent();
+          codeWriter.writeLine('end');
+          if (i !== len - 1) {
+            codeWriter.writeLine();
+          }
         }
       }
     }
@@ -219,9 +235,18 @@ define(function (require, exports, module) {
 
     codeWriter.writeLine(terms.join(' '));
     codeWriter.indent();
+
+    if (options.useAttributeAccessor) {
+      this.writeAttributeAccessor('short', codeWriter, element, options);
+    }
+
     this.writeConstructor(codeWriter, element, options);
-    codeWriter.writeLine();
-    this.writeAttributeAccessor(codeWriter, element, options);
+
+    if (!options.useAttributeAccessor) {
+      codeWriter.writeLine();
+      this.writeAttributeAccessor('long', codeWriter, element, options);
+    }
+
     codeWriter.outdent();
     codeWriter.writeLine();
 
