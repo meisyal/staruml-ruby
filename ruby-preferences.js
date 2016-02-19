@@ -12,17 +12,23 @@ define(function (require, exports, module) {
       text: 'Ruby Code Generation',
       type: 'Section',
     },
-    'ruby.gen.toStringMethod': {
-      text: 'to_s method',
-      description: 'Generate to_s method.',
+    'ruby.gen.initializeMethod': {
+      text: 'The initialize method',
+      description: 'Generate initialize method that works almost same way as constructor.',
       type: 'Check',
       default: true,
     },
     'ruby.gen.useAttributeAccessor': {
-      text: 'Use attribute accessor',
+      text: 'Attribute accessor',
       description: 'Use attribute accessor rather than set and get attribute methods.',
       type: 'Check',
       default: false,
+    },
+    'ruby.gen.toStringMethod': {
+      text: 'The to_s method',
+      description: 'Generate to_s method that returns a string representation of the object.',
+      type: 'Check',
+      default: true,
     },
   };
 
@@ -32,8 +38,9 @@ define(function (require, exports, module) {
 
   function getGenerateOptions() {
     return {
-      rubyToStringMethod: PreferenceManager.get('ruby.gen.toStringMethod'),
+      initializeMethod: PreferenceManager.get('ruby.gen.initializeMethod'),
       useAttributeAccessor: PreferenceManager.get('ruby.gen.useAttributeAccessor'),
+      rubyToStringMethod: PreferenceManager.get('ruby.gen.toStringMethod'),
     };
   }
 

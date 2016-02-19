@@ -131,7 +131,6 @@ define(function (require, exports, module) {
         }
 
         codeWriter.writeLine(terms.join(''));
-        codeWriter.writeLine();
       } else if (type === 'long') {
         for (i = 0; i < len; i++) {
           codeWriter.writeLine('def ' + element.attributes[i].name);
@@ -240,7 +239,11 @@ define(function (require, exports, module) {
       this.writeAttributeAccessor('short', codeWriter, element, options);
     }
 
-    this.writeConstructor(codeWriter, element, options);
+    if (options.initializeMethod) {
+      codeWriter.writeLine();
+      codeWriter.writeAttributeAccessor();
+      this.writeConstructor(codeWriter, element, options);
+    }
 
     if (!options.useAttributeAccessor) {
       codeWriter.writeLine();
