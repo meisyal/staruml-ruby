@@ -18,7 +18,9 @@ define(function (require, exports, module) {
 
   RubyCodeGenerator.prototype.getIndentString = function (options) {
     var indent = [];
-    for (var i = 0; i < 2; i++) {
+    var length = options.indentSpaces;
+
+    for (var i = 0; i < length; i++) {
       indent.push(' ');
     }
 
@@ -183,14 +185,13 @@ define(function (require, exports, module) {
     return terms;
   }
 
-  RubyCodeGenerator.prototype.writeToStringMethod = function () {
-    var terms = '';
-
-    terms += '  def to_s\n';
-    terms += '    \"{Your string representation of the object will be written here}\"\n';
-    terms += '  end';
-
-    return terms;
+  RubyCodeGenerator.prototype.writeToStringMethod = function (codeWriter) {
+    codeWriter.indent();
+    codeWriter.writeLine('def to_s');
+    codeWriter.indent();
+    codeWriter.writeLine('\"{Your string representation of the object will be written here}\"');
+    codeWriter.outdent();
+    codeWriter.writeLine('end');
   }
 
   RubyCodeGenerator.prototype.writeMethod = function (codeWriter, publicTerms, protectedTerms, privateTerms, options) {
@@ -217,7 +218,7 @@ define(function (require, exports, module) {
     codeWriter.writeLine();
 
     if (options.rubyToStringMethod) {
-      codeWriter.writeLine(this.writeToStringMethod());
+      this.writeToStringMethod(codeWriter);
     }
   };
 
@@ -241,7 +242,6 @@ define(function (require, exports, module) {
 
     if (options.initializeMethod) {
       codeWriter.writeLine();
-      codeWriter.writeAttributeAccessor();
       this.writeConstructor(codeWriter, element, options);
     }
 
@@ -285,6 +285,7 @@ define(function (require, exports, module) {
     }
 
     this.writeMethod(codeWriter, publicTerms, protectedTerms, privateTerms, options);
+    codeWriter.outdent();
     codeWriter.writeLine('end');
   };
 

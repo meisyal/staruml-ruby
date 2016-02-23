@@ -12,6 +12,12 @@ define(function (require, exports, module) {
       text: 'Ruby Code Generation',
       type: 'Section',
     },
+    'ruby.gen.indentSpaces': {
+      text: 'Indent Spaces',
+      description: 'Number of spaces for indentation.',
+      type: 'Number',
+      default: 2,
+    },
     'ruby.gen.initializeMethod': {
       text: 'The initialize method',
       description: 'Generate initialize method that works almost same way as constructor.',
@@ -38,6 +44,7 @@ define(function (require, exports, module) {
 
   function getGenerateOptions() {
     return {
+      indentSpaces: PreferenceManager.get('ruby.gen.indentSpaces'),
       initializeMethod: PreferenceManager.get('ruby.gen.initializeMethod'),
       useAttributeAccessor: PreferenceManager.get('ruby.gen.useAttributeAccessor'),
       rubyToStringMethod: PreferenceManager.get('ruby.gen.toStringMethod'),
