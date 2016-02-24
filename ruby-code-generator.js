@@ -57,7 +57,6 @@ define(function (require, exports, module) {
         FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
       } else {
         codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
-        codeWriter.writeLine();
         this.writeClass(codeWriter, element, options);
         fullPath = path + '/' + codeWriter.fileName(element.name) + '.rb';
         file = FileSystem.getFileForPath(fullPath);
@@ -159,9 +158,11 @@ define(function (require, exports, module) {
       var parameters = element.getNonReturnParameters();
       var len = parameters.length;
       var methodVisibility = this.getVisibility(element);
+      var indentationSpaces = this.getIndentString(options);
       var terms = '';
 
-      terms += '  def ' + element.name;
+      terms += indentationSpaces;
+      terms += 'def ' + element.name;
       if (len !== 0) {
         terms += '(';
         for (var i = 0; i < len; i++) {
@@ -176,9 +177,10 @@ define(function (require, exports, module) {
 
       terms += '\n';
       if (methodVisibility === 'public') {
-        terms += '  end';
+        terms += indentationSpaces + 'end';
       } else {
-        terms += '    end';
+        terms += indentationSpaces;
+        terms += indentationSpaces + 'end';
       }
     }
 
@@ -196,6 +198,7 @@ define(function (require, exports, module) {
 
   RubyCodeGenerator.prototype.writeMethod = function (codeWriter, publicTerms, protectedTerms, privateTerms, options) {
     if (publicTerms.length) {
+      codeWriter.writeLine();
       codeWriter.writeLine(publicTerms);
     }
 
@@ -215,9 +218,8 @@ define(function (require, exports, module) {
       codeWriter.outdent();
     }
 
-    codeWriter.writeLine();
-
     if (options.rubyToStringMethod) {
+      codeWriter.writeLine();
       this.writeToStringMethod(codeWriter);
     }
   };
@@ -238,10 +240,10 @@ define(function (require, exports, module) {
 
     if (options.useAttributeAccessor) {
       this.writeAttributeAccessor('short', codeWriter, element, options);
+      codeWriter.writeLine();
     }
 
     if (options.initializeMethod) {
-      codeWriter.writeLine();
       this.writeConstructor(codeWriter, element, options);
     }
 
@@ -251,7 +253,6 @@ define(function (require, exports, module) {
     }
 
     codeWriter.outdent();
-    codeWriter.writeLine();
 
     var len = element.operations.length;
     var publicTerms = '';
