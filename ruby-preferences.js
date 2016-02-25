@@ -12,6 +12,12 @@ define(function (require, exports, module) {
       text: 'Ruby Code Generation',
       type: 'Section',
     },
+    'ruby.gen.useTab': {
+      text: 'Use Tab',
+      description: 'Use tab for indentation instead of spaces.',
+      type: 'Check',
+      default: false,
+    },
     'ruby.gen.indentSpaces': {
       text: 'Indent Spaces',
       description: 'Number of spaces for indentation.',
@@ -44,6 +50,7 @@ define(function (require, exports, module) {
 
   function getGenerateOptions() {
     return {
+      useTab: PreferenceManager.get('ruby.gen.useTab'),
       indentSpaces: PreferenceManager.get('ruby.gen.indentSpaces'),
       initializeMethod: PreferenceManager.get('ruby.gen.initializeMethod'),
       useAttributeAccessor: PreferenceManager.get('ruby.gen.useAttributeAccessor'),

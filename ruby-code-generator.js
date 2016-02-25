@@ -20,11 +20,17 @@ define(function (require, exports, module) {
     var indent = [];
     var length = options.indentSpaces;
 
-    for (var i = 0; i < length; i++) {
-      indent.push(' ');
-    }
+    if (options.useTabs) {
+      return '\t';
+    } else {
+      var indent = [];
+      var length = options.indentSpaces;
+      for (var i = 0; i < length; i++) {
+        indent.push(' ');
+      }
 
-    return indent.join('');
+      return indent.join('');
+    }
   };
 
   RubyCodeGenerator.prototype.generate = function (element, path, options) {
