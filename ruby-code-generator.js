@@ -20,7 +20,7 @@ define(function (require, exports, module) {
     var indent = [];
     var length = options.indentSpaces;
 
-    if (options.useTabs) {
+    if (options.useTab) {
       return '\t';
     } else {
       var indent = [];
