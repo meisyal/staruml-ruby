@@ -193,16 +193,7 @@ define(function (require, exports, module) {
     return terms;
   }
 
-  RubyCodeGenerator.prototype.writeToStringMethod = function (codeWriter) {
-    codeWriter.indent();
-    codeWriter.writeLine('def to_s');
-    codeWriter.indent();
-    codeWriter.writeLine('\"{Your string representation of the object will be written here}\"');
-    codeWriter.outdent();
-    codeWriter.writeLine('end');
-  }
-
-  RubyCodeGenerator.prototype.writeMethod = function (codeWriter, publicTerms, protectedTerms, privateTerms, options) {
+  RubyCodeGenerator.prototype.writeMethod = function (codeWriter, publicTerms, protectedTerms, privateTerms) {
     if (publicTerms.length) {
       codeWriter.writeLine();
       codeWriter.writeLine(publicTerms);
@@ -223,12 +214,16 @@ define(function (require, exports, module) {
       codeWriter.writeLine(privateTerms);
       codeWriter.outdent();
     }
-
-    if (options.rubyToStringMethod) {
-      codeWriter.writeLine();
-      this.writeToStringMethod(codeWriter);
-    }
   };
+
+  RubyCodeGenerator.prototype.writeToStringMethod = function (codeWriter) {
+    codeWriter.indent();
+    codeWriter.writeLine('def to_s');
+    codeWriter.indent();
+    codeWriter.writeLine('\"{Your string representation of the object will be written here}\"');
+    codeWriter.outdent();
+    codeWriter.writeLine('end');
+  }
 
   RubyCodeGenerator.prototype.writeClass = function (codeWriter, element, options) {
     var terms = [];
@@ -269,29 +264,36 @@ define(function (require, exports, module) {
       var methodVisibility = this.getVisibility(element.operations[i]);
       var methodString = this.constructMethod(codeWriter, element.operations[i], options);
 
-      if (i !== len - 1) {
-        if (methodVisibility === 'public') {
-          publicTerms += methodString;
+      if (methodVisibility === 'public') {
+        publicTerms += methodString;
+        if (i === len - 1) {
+          publicTerms += '\n';
+        } else {
           publicTerms += '\n\n';
-        } else if (methodVisibility === 'protected') {
-          protectedTerms += methodString;
-          protectedTerms += '\n\n';
-        } else if (methodVisibility === 'private') {
-          privateTerms += methodString;
-          privateTerms += '\n\n';
         }
-      } else {
-        if (methodVisibility === 'public') {
-          publicTerms += methodString;
-        } else if (methodVisibility === 'protected') {
-          protectedTerms += methodString;
-        } else if (methodVisibility === 'private') {
-          privateTerms += methodString;
+      } else if (methodVisibility === 'protected') {
+        protectedTerms += methodString;
+        if (i === len - 1) {
+          protectedTerms += '\n';
+        } else {
+          protectedTerms += '\n\n';
+        }
+      } else if (methodVisibility === 'private') {
+        privateTerms += methodString;
+        if (i === len - 1) {
+          privateTerms += '\n';
+        } else {
+          privateTerms += '\n\n';
         }
       }
     }
 
-    this.writeMethod(codeWriter, publicTerms, protectedTerms, privateTerms, options);
+    this.writeMethod(codeWriter, publicTerms, protectedTerms, privateTerms);
+
+    if (options.rubyToStringMethod) {
+      this.writeToStringMethod(codeWriter);
+    }
+
     codeWriter.outdent();
     codeWriter.writeLine('end');
   };
