@@ -220,7 +220,7 @@ define(function (require, exports, module) {
     codeWriter.indent();
     codeWriter.writeLine('def to_s');
     codeWriter.indent();
-    codeWriter.writeLine('\"{Your string representation of the object will be written here}\"');
+    codeWriter.writeLine('\"Your string representation of the object will be written here.\"');
     codeWriter.outdent();
     codeWriter.writeLine('end');
   }
@@ -256,6 +256,22 @@ define(function (require, exports, module) {
     codeWriter.outdent();
 
     var len = element.operations.length;
+    var publicMethodLastIndex;
+    var protectedMethodLastIndex;
+    var privateMethodLastIndex;
+
+    for (var i = 0; i < len; i++) {
+      var methodVisibility = this.getVisibility(element.operations[i]);
+
+      if (methodVisibility === 'public') {
+        publicMethodLastIndex = i;
+      } else if (methodVisibility === 'protected') {
+        protectedMethodLastIndex = i;
+      } else if (methodVisibility === 'private') {
+        privateMethodLastIndex = i;
+      }
+    }
+
     var publicTerms = '';
     var protectedTerms = '';
     var privateTerms = '';
@@ -266,21 +282,21 @@ define(function (require, exports, module) {
 
       if (methodVisibility === 'public') {
         publicTerms += methodString;
-        if (i === len - 1) {
+        if (i === publicMethodLastIndex) {
           publicTerms += '\n';
         } else {
           publicTerms += '\n\n';
         }
       } else if (methodVisibility === 'protected') {
         protectedTerms += methodString;
-        if (i === len - 1) {
+        if (i === protectedMethodLastIndex) {
           protectedTerms += '\n';
         } else {
           protectedTerms += '\n\n';
         }
       } else if (methodVisibility === 'private') {
         privateTerms += methodString;
-        if (i === len - 1) {
+        if (i === privateMethodLastIndex) {
           privateTerms += '\n';
         } else {
           privateTerms += '\n\n';
