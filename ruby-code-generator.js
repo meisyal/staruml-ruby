@@ -279,6 +279,7 @@ define(function (require, exports, module) {
     for (var i = 0; i < len; i++) {
       var methodVisibility = this.getVisibility(element.operations[i]);
       var methodString = this.constructMethod(codeWriter, element.operations[i], options);
+      var indentationSpaces = this.getIndentString(options);
 
       if (methodVisibility === 'public') {
         publicTerms += methodString;
@@ -293,6 +294,7 @@ define(function (require, exports, module) {
           protectedTerms += '\n';
         } else {
           protectedTerms += '\n\n';
+          protectedTerms += indentationSpaces;
         }
       } else if (methodVisibility === 'private') {
         privateTerms += methodString;
@@ -300,6 +302,7 @@ define(function (require, exports, module) {
           privateTerms += '\n';
         } else {
           privateTerms += '\n\n';
+          privateTerms += indentationSpaces;
         }
       }
     }
