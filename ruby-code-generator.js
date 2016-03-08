@@ -310,6 +310,10 @@ define(function (require, exports, module) {
     this.writeMethod(codeWriter, publicTerms, protectedTerms, privateTerms);
 
     if (options.rubyToStringMethod) {
+      if (len === 0) {
+        codeWriter.writeLine();
+      }
+
       this.writeToStringMethod(codeWriter);
     }
 
