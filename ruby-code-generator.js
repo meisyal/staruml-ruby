@@ -123,10 +123,10 @@ define(function (require, exports, module) {
 
   RubyCodeGenerator.prototype.writeAttributeAccessor = function (type, codeWriter, element, options) {
     var terms = [];
+    var len = element.attributes.length;
 
-    if (element.name.length) {
+    if (len) {
       var i;
-      var len = element.attributes.length;
 
       if (type === 'short') {
         terms.push('attr_accessor ');
