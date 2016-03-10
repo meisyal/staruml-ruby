@@ -138,7 +138,9 @@ define(function (require, exports, module) {
         }
 
         codeWriter.writeLine(terms.join(''));
+        codeWriter.writeLine();
       } else if (type === 'long') {
+        codeWriter.writeLine();
         for (i = 0; i < len; i++) {
           codeWriter.writeLine('def ' + element.attributes[i].name);
           codeWriter.indent();
@@ -241,7 +243,6 @@ define(function (require, exports, module) {
 
     if (options.useAttributeAccessor) {
       this.writeAttributeAccessor('short', codeWriter, element, options);
-      codeWriter.writeLine();
     }
 
     if (options.initializeMethod) {
@@ -249,7 +250,6 @@ define(function (require, exports, module) {
     }
 
     if (!options.useAttributeAccessor) {
-      codeWriter.writeLine();
       this.writeAttributeAccessor('long', codeWriter, element, options);
     }
 
