@@ -185,8 +185,12 @@ define(function (require, exports, module) {
 
       terms += '\n';
       if (methodVisibility === 'public') {
+        terms += indentationSpaces + indentationSpaces;
+        terms += '# TODO(person name): Implement this method here.\n';
         terms += indentationSpaces + 'end';
       } else {
+        terms += indentationSpaces + indentationSpaces + indentationSpaces;
+        terms += '# TODO(person name): Implement this method here.\n';
         terms += indentationSpaces;
         terms += indentationSpaces + 'end';
       }
