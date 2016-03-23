@@ -17,9 +17,6 @@ define(function (require, exports, module) {
   }
 
   RubyCodeGenerator.prototype.getIndentString = function (options) {
-    var indent = [];
-    var length = options.indentSpaces;
-
     if (options.useTab) {
       return '\t';
     } else {
