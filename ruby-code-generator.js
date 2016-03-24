@@ -32,6 +32,7 @@ define(function (require, exports, module) {
 
   RubyCodeGenerator.prototype.generate = function (element, path, options) {
     var result = new $.Deferred();
+    var self = this;
     var fullPath;
     var directory;
     var codeWriter;
@@ -43,7 +44,7 @@ define(function (require, exports, module) {
       directory.create(function (error, stat) {
         if (!error) {
           Async.doSequentially(element.ownedElements, function (child) {
-            return generate(child, fullPath, options);
+            return self.generate(child, fullPath, options);
           }, false).then(result.resolve, result.reject);
         } else {
           result.reject(error);
@@ -60,7 +61,18 @@ define(function (require, exports, module) {
         FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
       } else {
         codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
+        var moduleName = this.writePackage(codeWriter, element);
+        if (moduleName) {
+          codeWriter.writeLine('module ' + moduleName);
+          codeWriter.indent();
+        }
+
         this.writeClass(codeWriter, element, options);
+        if (moduleName) {
+          codeWriter.outdent();
+          codeWriter.writeLine('end');
+        }
+
         fullPath = path + '/' + codeWriter.fileName(element.name) + '.rb';
         file = FileSystem.getFileForPath(fullPath);
         FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
@@ -94,9 +106,7 @@ define(function (require, exports, module) {
       }).join('.');
     }
 
-    if (path) {
-      codeWriter.writeLine('module ' + path);
-    }
+    return path;
   };
 
   RubyCodeGenerator.prototype.getSuperClasses = function (element) {
