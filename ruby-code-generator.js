@@ -85,6 +85,20 @@ define(function (require, exports, module) {
     return null;
   };
 
+  RubyCodeGenerator.prototype.writePackage = function (codeWriter, element) {
+    var path = null;
+
+    if (element._parent) {
+      path = _.map(element._parent.getPath(this.baseModel), function (e) {
+        return e.name
+      }).join('.');
+    }
+
+    if (path) {
+      codeWriter.writeLine('module ' + path);
+    }
+  };
+
   RubyCodeGenerator.prototype.getSuperClasses = function (element) {
     var inheritances = Repository.getRelationshipsOf(element, function (relationship) {
       return (relationship instanceof type.UMLGeneralization && relationship.source === element);
