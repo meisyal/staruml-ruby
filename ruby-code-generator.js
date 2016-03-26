@@ -32,7 +32,7 @@ define(function (require, exports, module) {
 
   RubyCodeGenerator.prototype.generate = function (element, path, options) {
     var result = new $.Deferred();
-    var self = this;
+    var _this = this;
     var fullPath;
     var directory;
     var codeWriter;
@@ -44,7 +44,7 @@ define(function (require, exports, module) {
       directory.create(function (error, stat) {
         if (!error) {
           Async.doSequentially(element.ownedElements, function (child) {
-            return self.generate(child, fullPath, options);
+            return _this.generate(child, fullPath, options);
           }, false).then(result.resolve, result.reject);
         } else {
           result.reject(error);
