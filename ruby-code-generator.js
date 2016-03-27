@@ -51,15 +51,7 @@ define(function (require, exports, module) {
         }
       });
     } else if (element instanceof type.UMLClass) {
-      if (element.stereotype === 'annotationType') {
-        codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
-        codeWriter.writeLine();
-        codeWriter.writeLine('this is annotation');
-        codeWriter.writeLine();
-        fullPath = path + '/' + element.name + '.rb';
-        file = FileSystem.getFileForPath(fullPath);
-        FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
-      } else {
+      if (element.stereotype !== 'annotationType') {
         codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
         var moduleName = this.writePackage(codeWriter, element);
         if (moduleName) {
