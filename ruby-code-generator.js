@@ -341,6 +341,7 @@ define(function (require, exports, module) {
   function generate(baseModel, basePath, options) {
     var result = new $.Deferred();
     var rubyCodeGenerator = new RubyCodeGenerator(baseModel, basePath);
+
     return rubyCodeGenerator.generate(baseModel, basePath, options);
   }
 
