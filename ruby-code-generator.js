@@ -134,7 +134,7 @@ define(function (require, exports, module) {
     }
   };
 
-  RubyCodeGenerator.prototype.writeAttributeAccessor = function (type, codeWriter, element, options) {
+  RubyCodeGenerator.prototype.writeAttributeAccessor = function (type, visibility, codeWriter, element, options) {
     var terms = [];
     var len = element.attributes.length;
 
@@ -144,9 +144,13 @@ define(function (require, exports, module) {
       if (type === 'short') {
         terms.push('attr_accessor ');
         for (i = 0; i < len; i++) {
-          terms.push(':' + element.attributes[i].name);
-          if (i !== len - 1) {
-            terms.push(', ');
+          var attributeVisibility = this.getVisibility(element.attributes[i]);
+
+          if (attributeVisibility === visibility) {
+            terms.push(':' + element.attributes[i].name);
+            if (i !== len - 1) {
+              terms.push(', ');
+            }
           }
         }
 
@@ -155,19 +159,23 @@ define(function (require, exports, module) {
       } else if (type === 'long') {
         codeWriter.writeLine();
         for (i = 0; i < len; i++) {
-          codeWriter.writeLine('def ' + element.attributes[i].name);
-          codeWriter.indent();
-          codeWriter.writeLine('@' + element.attributes[i].name);
-          codeWriter.outdent();
-          codeWriter.writeLine('end');
-          codeWriter.writeLine();
-          codeWriter.writeLine('def ' + element.attributes[i].name + '=(value)');
-          codeWriter.indent();
-          codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
-          codeWriter.outdent();
-          codeWriter.writeLine('end');
-          if (i !== len - 1) {
+          var attributeVisibility = this.getVisibility(element.attributes[i]);
+
+          if (attributeVisibility === visibility) {
+            codeWriter.writeLine('def ' + element.attributes[i].name);
+            codeWriter.indent();
+            codeWriter.writeLine('@' + element.attributes[i].name);
+            codeWriter.outdent();
+            codeWriter.writeLine('end');
             codeWriter.writeLine();
+            codeWriter.writeLine('def ' + element.attributes[i].name + '=(value)');
+            codeWriter.indent();
+            codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
+            codeWriter.outdent();
+            codeWriter.writeLine('end');
+            if (i !== len - 1) {
+              codeWriter.writeLine();
+            }
           }
         }
       }
@@ -259,7 +267,7 @@ define(function (require, exports, module) {
     codeWriter.indent();
 
     if (options.useAttributeAccessor) {
-      this.writeAttributeAccessor('short', codeWriter, element, options);
+      this.writeAttributeAccessor('short', 'public', codeWriter, element, options);
     }
 
     if (options.initializeMethod) {
@@ -267,7 +275,7 @@ define(function (require, exports, module) {
     }
 
     if (!options.useAttributeAccessor) {
-      this.writeAttributeAccessor('long', codeWriter, element, options);
+      this.writeAttributeAccessor('long', 'public', codeWriter, element, options);
     }
 
     codeWriter.outdent();
