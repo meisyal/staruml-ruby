@@ -247,23 +247,33 @@ define(function (require, exports, module) {
       codeWriter.writeLine(publicTerms);
     }
 
-    if (protectedTerms.length) {
+    if (element.attributes.length) {
+      codeWriter.writeLine();
       codeWriter.indent();
       codeWriter.writeLine('protected');
       codeWriter.indent();
       this.writeAttributeAccessor('short', 'protected', codeWriter, element);
       codeWriter.outdent();
-      codeWriter.writeLine(protectedTerms);
+      if (protectedTerms.length) {
+        codeWriter.writeLine(protectedTerms);
+        codeWriter.outdent();
+      }
+
       codeWriter.outdent();
     }
 
-    if (privateTerms.length) {
+    if (element.attributes.length) {
+      codeWriter.writeLine();
       codeWriter.indent();
       codeWriter.writeLine('private');
       codeWriter.indent();
       this.writeAttributeAccessor('short', 'private', codeWriter, element);
       codeWriter.outdent();
-      codeWriter.writeLine(privateTerms);
+      if (privateTerms.length) {
+        codeWriter.writeLine(privateTerms);
+        codeWriter.outdent();
+      }
+
       codeWriter.outdent();
     }
   };
