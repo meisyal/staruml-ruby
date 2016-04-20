@@ -137,12 +137,13 @@ define(function (require, exports, module) {
   RubyCodeGenerator.prototype.writeAttributeAccessor = function (type, visibility, codeWriter, element) {
     var terms = [];
     var len = element.attributes.length;
+    var attributeVisibility;
     var publicAttributeLastIndex;
     var protectedAttributeLastIndex;
     var privateAttributeLastIndex;
 
     for (i = 0; i < len; i++) {
-      var attributeVisibility = this.getVisibility(element.attributes[i]);
+      attributeVisibility = this.getVisibility(element.attributes[i]);
 
       if (attributeVisibility === 'public') {
         publicAttributeLastIndex = i;
@@ -153,23 +154,47 @@ define(function (require, exports, module) {
       }
     }
 
-    console.log(publicAttributeLastIndex + " " + protectedAttributeLastIndex + " " + privateAttributeLastIndex);
-
     if (len) {
       var i;
 
-      if (type === 'short') {
+      if (type === 'short' && visibility === 'public') {
         terms.push('attr_accessor ');
         for (i = 0; i < len; i++) {
-          var attributeVisibility = this.getVisibility(element.attributes[i]);
+          attributeVisibility = this.getVisibility(element.attributes[i]);
 
-          if (attributeVisibility === visibility) {
+          if (attributeVisibility === 'public') {
             terms.push(':' + element.attributes[i].name);
             if (i !== publicAttributeLastIndex) {
               terms.push(', ');
-            } else if (i !== protectedAttributeLastIndex) {
+            }
+          }
+        }
+
+        codeWriter.writeLine(terms.join(''));
+        codeWriter.writeLine();
+      } else if (type === 'short' && visibility === 'protected') {
+        terms.push('attr_accessor ');
+        for (i = 0; i < len; i++) {
+          attributeVisibility = this.getVisibility(element.attributes[i]);
+
+          if (attributeVisibility === 'protected') {
+            terms.push(':' + element.attributes[i].name);
+            if (i !== protectedAttributeLastIndex) {
               terms.push(', ');
-            } else if (i !== privateAttributeLastIndex) {
+            }
+          }
+        }
+
+        codeWriter.writeLine(terms.join(''));
+        codeWriter.writeLine();
+      } else if (type === 'short' && visibility === 'private') {
+        terms.push('attr_accessor ');
+        for (i = 0; i < len; i++) {
+          attributeVisibility = this.getVisibility(element.attributes[i]);
+
+          if (attributeVisibility === 'private') {
+            terms.push(':' + element.attributes[i].name);
+            if (i !== privateAttributeLastIndex) {
               terms.push(', ');
             }
           }
