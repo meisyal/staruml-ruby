@@ -272,7 +272,22 @@ define(function (require, exports, module) {
       codeWriter.writeLine(publicTerms);
     }
 
-    if (element.attributes.length) {
+    var protectedElementCount = 0;
+    var privateElementCount = 0;
+    var len = element.attributes.length;
+    var elementVisibility;
+
+    for (var i = 0; i < len; i++) {
+      elementVisibility = this.getVisibility(element.attributes[i]);
+
+      if (elementVisibility === 'protected') {
+        protectedElementCount++;
+      } else if (elementVisibility === 'private') {
+        privateElementCount++;
+      }
+    }
+
+    if (protectedElementCount) {
       codeWriter.writeLine();
       codeWriter.indent();
       codeWriter.writeLine('protected');
@@ -287,7 +302,7 @@ define(function (require, exports, module) {
       codeWriter.outdent();
     }
 
-    if (element.attributes.length) {
+    if (privateElementCount) {
       codeWriter.writeLine();
       codeWriter.indent();
       codeWriter.writeLine('private');
