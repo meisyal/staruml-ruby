@@ -272,22 +272,7 @@ define(function (require, exports, module) {
       codeWriter.writeLine(publicTerms);
     }
 
-    var protectedElementCount = 0;
-    var privateElementCount = 0;
-    var len = element.attributes.length;
-    var elementVisibility;
-
-    for (var i = 0; i < len; i++) {
-      elementVisibility = this.getVisibility(element.attributes[i]);
-
-      if (elementVisibility === 'protected') {
-        protectedElementCount++;
-      } else if (elementVisibility === 'private') {
-        privateElementCount++;
-      }
-    }
-
-    if (protectedElementCount) {
+    if (this.countAttributeByVisibility('protected', element)) {
       codeWriter.writeLine();
       codeWriter.indent();
       codeWriter.writeLine('protected');
@@ -302,7 +287,7 @@ define(function (require, exports, module) {
       codeWriter.outdent();
     }
 
-    if (privateElementCount) {
+    if (this.countAttributeByVisibility('private', element)) {
       codeWriter.writeLine();
       codeWriter.indent();
       codeWriter.writeLine('private');
@@ -317,6 +302,34 @@ define(function (require, exports, module) {
       codeWriter.outdent();
     }
   };
+
+  RubyCodeGenerator.prototype.countAttributeByVisibility = function (visibility, element) {
+    var publicElementCount = 0;
+    var protectedElementCount = 0;
+    var privateElementCount = 0;
+    var len = element.attributes.length;
+    var elementVisibility;
+
+    for (var i = 0; i < len; i++) {
+      elementVisibility = this.getVisibility(element.attributes[i]);
+
+      if (elementVisibility === 'public') {
+        publicElementCount++;
+      } else if (elementVisibility === 'protected') {
+        protectedElementCount++;
+      } else if (elementVisibility === 'private') {
+        privateElementCount++;
+      }
+    }
+
+    if (visibility === 'public') {
+      return publicElementCount;
+    } else if (visibility === 'protected') {
+      return protectedElementCount;
+    } else if (visibility === 'private') {
+      return privateElementCount;
+    }
+  }
 
   RubyCodeGenerator.prototype.writeToStringMethod = function (codeWriter) {
     codeWriter.indent();
@@ -341,7 +354,7 @@ define(function (require, exports, module) {
     codeWriter.writeLine(terms.join(' '));
     codeWriter.indent();
 
-    if (options.useAttributeAccessor) {
+    if (options.useAttributeAccessor && this.countAttributeByVisibility('public', element)) {
       this.writeAttributeAccessor('short', 'public', codeWriter, element);
     }
 
