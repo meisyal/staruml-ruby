@@ -262,7 +262,7 @@ define(function (require, exports, module) {
     return terms;
   }
 
-  RubyCodeGenerator.prototype.writeMethod = function (publicTerms, protectedTerms, privateTerms, codeWriter, element) {
+  RubyCodeGenerator.prototype.writeMethod = function (publicTerms, protectedTerms, privateTerms, codeWriter, element, options) {
     if (publicTerms.length) {
       codeWriter.writeLine();
       codeWriter.writeLine(publicTerms);
@@ -273,7 +273,10 @@ define(function (require, exports, module) {
       codeWriter.indent();
       codeWriter.writeLine('protected');
       codeWriter.indent();
-      this.writeAttributeAccessor('short', 'protected', codeWriter, element);
+      if (options.useAttributeAccessor) {
+        this.writeAttributeAccessor('short', 'protected', codeWriter, element);
+      }
+
       codeWriter.outdent();
       if (protectedTerms.length) {
         codeWriter.writeLine(protectedTerms);
@@ -288,7 +291,10 @@ define(function (require, exports, module) {
       codeWriter.indent();
       codeWriter.writeLine('private');
       codeWriter.indent();
-      this.writeAttributeAccessor('short', 'private', codeWriter, element);
+      if (options.useAttributeAccessor) {
+        this.writeAttributeAccessor('short', 'private', codeWriter, element);
+      }
+
       codeWriter.outdent();
       if (privateTerms.length) {
         codeWriter.writeLine(privateTerms);
@@ -416,7 +422,7 @@ define(function (require, exports, module) {
       }
     }
 
-    this.writeMethod(publicTerms, protectedTerms, privateTerms, codeWriter, element);
+    this.writeMethod(publicTerms, protectedTerms, privateTerms, codeWriter, element, options);
 
     if (options.rubyToStringMethod) {
       if (len === 0) {
