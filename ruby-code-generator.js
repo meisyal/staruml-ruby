@@ -275,6 +275,8 @@ define(function (require, exports, module) {
       codeWriter.indent();
       if (options.useAttributeAccessor) {
         this.writeAttributeAccessor('short', 'protected', codeWriter, element);
+      } else if (!options.useAttributeAccessor) {
+        this.writeAttributeAccessor('long', 'protected', codeWriter, element);
       }
 
       codeWriter.outdent();
@@ -293,6 +295,8 @@ define(function (require, exports, module) {
       codeWriter.indent();
       if (options.useAttributeAccessor) {
         this.writeAttributeAccessor('short', 'private', codeWriter, element);
+      } else if (!options.useAttributeAccessor) {
+        this.writeAttributeAccessor('long', 'private', codeWriter, element);
       }
 
       codeWriter.outdent();
