@@ -183,7 +183,6 @@ define(function (require, exports, module) {
       }
 
       codeWriter.writeLine(terms.join(''));
-      codeWriter.writeLine();
     } else if (type === 'short' && visibility === 'private') {
       terms.push('attr_accessor ');
       for (var i = 0; i < len; i++) {
@@ -198,13 +197,12 @@ define(function (require, exports, module) {
       }
 
       codeWriter.writeLine(terms.join(''));
-      codeWriter.writeLine();
-    } else if (type === 'long') {
+    } else if (type === 'long' && visibility === 'public') {
       codeWriter.writeLine();
       for (var i = 0; i < len; i++) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
-        if (attributeVisibility === visibility) {
+        if (attributeVisibility === 'public') {
           codeWriter.writeLine('def ' + element.attributes[i].name);
           codeWriter.indent();
           codeWriter.writeLine('@' + element.attributes[i].name);
@@ -216,7 +214,51 @@ define(function (require, exports, module) {
           codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
           codeWriter.outdent();
           codeWriter.writeLine('end');
-          if (i !== len - 1) {
+          if (i !== publicAttributeLastIndex) {
+            codeWriter.writeLine();
+          }
+        }
+      }
+    } else if (type === 'long' && visibility === 'protected') {
+      codeWriter.writeLine();
+      for (var i = 0; i < len; i++) {
+        attributeVisibility = this.getVisibility(element.attributes[i]);
+
+        if (attributeVisibility === 'protected') {
+          codeWriter.writeLine('def ' + element.attributes[i].name);
+          codeWriter.indent();
+          codeWriter.writeLine('@' + element.attributes[i].name);
+          codeWriter.outdent();
+          codeWriter.writeLine('end');
+          codeWriter.writeLine();
+          codeWriter.writeLine('def ' + element.attributes[i].name + '=(value)');
+          codeWriter.indent();
+          codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
+          codeWriter.outdent();
+          codeWriter.writeLine('end');
+          if (i !== protectedAttributeLastIndex) {
+            codeWriter.writeLine();
+          }
+        }
+      }
+    } else if (type === 'long' && visibility === 'private') {
+      codeWriter.writeLine();
+      for (var i = 0; i < len; i++) {
+        attributeVisibility = this.getVisibility(element.attributes[i]);
+
+        if (attributeVisibility === 'private') {
+          codeWriter.writeLine('def ' + element.attributes[i].name);
+          codeWriter.indent();
+          codeWriter.writeLine('@' + element.attributes[i].name);
+          codeWriter.outdent();
+          codeWriter.writeLine('end');
+          codeWriter.writeLine();
+          codeWriter.writeLine('def ' + element.attributes[i].name + '=(value)');
+          codeWriter.indent();
+          codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
+          codeWriter.outdent();
+          codeWriter.writeLine('end');
+          if (i !== privateAttributeLastIndex) {
             codeWriter.writeLine();
           }
         }
@@ -275,8 +317,10 @@ define(function (require, exports, module) {
       codeWriter.indent();
       if (options.useAttributeAccessor) {
         this.writeAttributeAccessor('short', 'protected', codeWriter, element);
+        codeWriter.writeLine();
       } else if (!options.useAttributeAccessor) {
         this.writeAttributeAccessor('long', 'protected', codeWriter, element);
+        codeWriter.writeLine();
       }
 
       codeWriter.outdent();
@@ -295,8 +339,10 @@ define(function (require, exports, module) {
       codeWriter.indent();
       if (options.useAttributeAccessor) {
         this.writeAttributeAccessor('short', 'private', codeWriter, element);
+        codeWriter.writeLine();
       } else if (!options.useAttributeAccessor) {
         this.writeAttributeAccessor('long', 'private', codeWriter, element);
+        codeWriter.writeLine();
       }
 
       codeWriter.outdent();
