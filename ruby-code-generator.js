@@ -327,7 +327,6 @@ define(function (require, exports, module) {
       }
 
       codeWriter.outdent();
-      codeWriter.writeLine();
     }
 
     if (this.countAttributeByVisibility('private', element)) {
@@ -349,7 +348,6 @@ define(function (require, exports, module) {
       }
 
       codeWriter.outdent();
-      codeWriter.writeLine();
     }
   };
 
