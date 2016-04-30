@@ -168,7 +168,6 @@ define(function (require, exports, module) {
       }
 
       codeWriter.writeLine(terms.join(''));
-      codeWriter.writeLine();
     } else if (type === 'short' && visibility === 'protected') {
       terms.push('attr_accessor ');
       for (var i = 0; i < len; i++) {
@@ -306,12 +305,10 @@ define(function (require, exports, module) {
 
   RubyCodeGenerator.prototype.writeMethod = function (publicTerms, protectedTerms, privateTerms, codeWriter, element, options) {
     if (publicTerms.length) {
-      codeWriter.writeLine();
       codeWriter.writeLine(publicTerms);
     }
 
     if (this.countAttributeByVisibility('protected', element)) {
-      codeWriter.writeLine();
       codeWriter.indent();
       codeWriter.writeLine('protected');
       codeWriter.indent();
@@ -330,10 +327,10 @@ define(function (require, exports, module) {
       }
 
       codeWriter.outdent();
+      codeWriter.writeLine();
     }
 
     if (this.countAttributeByVisibility('private', element)) {
-      codeWriter.writeLine();
       codeWriter.indent();
       codeWriter.writeLine('private');
       codeWriter.indent();
@@ -352,6 +349,7 @@ define(function (require, exports, module) {
       }
 
       codeWriter.outdent();
+      codeWriter.writeLine();
     }
   };
 
@@ -408,14 +406,17 @@ define(function (require, exports, module) {
 
     if (options.useAttributeAccessor && this.countAttributeByVisibility('public', element)) {
       this.writeAttributeAccessor('short', 'public', codeWriter, element);
+      codeWriter.writeLine();
     }
 
     if (options.initializeMethod) {
       this.writeConstructor(codeWriter, element, options);
+      codeWriter.writeLine();
     }
 
     if (!options.useAttributeAccessor) {
       this.writeAttributeAccessor('long', 'public', codeWriter, element);
+      codeWriter.writeLine();
     }
 
     codeWriter.outdent();
@@ -475,10 +476,6 @@ define(function (require, exports, module) {
     this.writeMethod(publicTerms, protectedTerms, privateTerms, codeWriter, element, options);
 
     if (options.rubyToStringMethod) {
-      if (len === 0) {
-        codeWriter.writeLine();
-      }
-
       this.writeToStringMethod(codeWriter);
     }
 
