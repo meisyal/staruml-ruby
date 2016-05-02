@@ -197,7 +197,6 @@ define(function (require, exports, module) {
 
       codeWriter.writeLine(terms.join(''));
     } else if (type === 'long' && visibility === 'public') {
-      codeWriter.writeLine();
       for (var i = 0; i < len; i++) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
@@ -412,7 +411,7 @@ define(function (require, exports, module) {
       codeWriter.writeLine();
     }
 
-    if (!options.useAttributeAccessor) {
+    if (!options.useAttributeAccessor && this.countAttributeByVisibility('public', element)) {
       this.writeAttributeAccessor('long', 'public', codeWriter, element);
       codeWriter.writeLine();
     }
