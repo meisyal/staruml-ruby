@@ -17,9 +17,6 @@ define(function (require, exports, module) {
   }
 
   RubyCodeGenerator.prototype.getIndentString = function (options) {
-    var indent = [];
-    var length = options.indentSpaces;
-
     if (options.useTab) {
       return '\t';
     } else {
@@ -35,6 +32,7 @@ define(function (require, exports, module) {
 
   RubyCodeGenerator.prototype.generate = function (element, path, options) {
     var result = new $.Deferred();
+    var _this = this;
     var fullPath;
     var directory;
     var codeWriter;
@@ -46,24 +44,27 @@ define(function (require, exports, module) {
       directory.create(function (error, stat) {
         if (!error) {
           Async.doSequentially(element.ownedElements, function (child) {
-            return generate(child, fullPath, options);
+            return _this.generate(child, fullPath, options);
           }, false).then(result.resolve, result.reject);
         } else {
           result.reject(error);
         }
       });
     } else if (element instanceof type.UMLClass) {
-      if (element.stereotype === 'annotationType') {
+      if (element.stereotype !== 'annotationType') {
         codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
-        codeWriter.writeLine();
-        codeWriter.writeLine('this is annotation');
-        codeWriter.writeLine();
-        fullPath = path + '/' + element.name + '.rb';
-        file = FileSystem.getFileForPath(fullPath);
-        FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
-      } else {
-        codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
+        var moduleName = this.writePackage(codeWriter, element);
+        if (moduleName) {
+          codeWriter.writeLine('module ' + moduleName);
+          codeWriter.indent();
+        }
+
         this.writeClass(codeWriter, element, options);
+        if (moduleName) {
+          codeWriter.outdent();
+          codeWriter.writeLine('end');
+        }
+
         fullPath = path + '/' + codeWriter.fileName(element.name) + '.rb';
         file = FileSystem.getFileForPath(fullPath);
         FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
@@ -86,6 +87,18 @@ define(function (require, exports, module) {
     }
 
     return null;
+  };
+
+  RubyCodeGenerator.prototype.writePackage = function (codeWriter, element) {
+    var path = null;
+
+    if (element._parent) {
+      path = _.map(element._parent.getPath(this.baseModel), function (e) {
+        return e.name
+      }).join('.');
+    }
+
+    return path;
   };
 
   RubyCodeGenerator.prototype.getSuperClasses = function (element) {
@@ -121,27 +134,73 @@ define(function (require, exports, module) {
     }
   };
 
-  RubyCodeGenerator.prototype.writeAttributeAccessor = function (type, codeWriter, element, options) {
+  RubyCodeGenerator.prototype.writeAttributeAccessor = function (type, visibility, codeWriter, element) {
     var terms = [];
     var len = element.attributes.length;
+    var attributeVisibility;
+    var publicAttributeLastIndex;
+    var protectedAttributeLastIndex;
+    var privateAttributeLastIndex;
 
-    if (len) {
-      var i;
+    for (var i = 0; i < len; i++) {
+      attributeVisibility = this.getVisibility(element.attributes[i]);
 
-      if (type === 'short') {
-        terms.push('attr_accessor ');
-        for (i = 0; i < len; i++) {
+      if (attributeVisibility === 'public') {
+        publicAttributeLastIndex = i;
+      } else if (attributeVisibility === 'protected') {
+        protectedAttributeLastIndex = i;
+      } else if (attributeVisibility === 'private') {
+        privateAttributeLastIndex = i;
+      }
+    }
+
+    if (type === 'short' && visibility === 'public') {
+      terms.push('attr_accessor ');
+      for (var i = 0; i < len; i++) {
+        attributeVisibility = this.getVisibility(element.attributes[i]);
+
+        if (attributeVisibility === 'public') {
           terms.push(':' + element.attributes[i].name);
-          if (i !== len - 1) {
+          if (i !== publicAttributeLastIndex) {
             terms.push(', ');
           }
         }
+      }
 
-        codeWriter.writeLine(terms.join(''));
-        codeWriter.writeLine();
-      } else if (type === 'long') {
-        codeWriter.writeLine();
-        for (i = 0; i < len; i++) {
+      codeWriter.writeLine(terms.join(''));
+    } else if (type === 'short' && visibility === 'protected') {
+      terms.push('attr_accessor ');
+      for (var i = 0; i < len; i++) {
+        attributeVisibility = this.getVisibility(element.attributes[i]);
+
+        if (attributeVisibility === 'protected') {
+          terms.push(':' + element.attributes[i].name);
+          if (i !== protectedAttributeLastIndex) {
+            terms.push(', ');
+          }
+        }
+      }
+
+      codeWriter.writeLine(terms.join(''));
+    } else if (type === 'short' && visibility === 'private') {
+      terms.push('attr_accessor ');
+      for (var i = 0; i < len; i++) {
+        attributeVisibility = this.getVisibility(element.attributes[i]);
+
+        if (attributeVisibility === 'private') {
+          terms.push(':' + element.attributes[i].name);
+          if (i !== privateAttributeLastIndex) {
+            terms.push(', ');
+          }
+        }
+      }
+
+      codeWriter.writeLine(terms.join(''));
+    } else if (type === 'long' && visibility === 'public') {
+      for (var i = 0; i < len; i++) {
+        attributeVisibility = this.getVisibility(element.attributes[i]);
+
+        if (attributeVisibility === 'public') {
           codeWriter.writeLine('def ' + element.attributes[i].name);
           codeWriter.indent();
           codeWriter.writeLine('@' + element.attributes[i].name);
@@ -153,7 +212,51 @@ define(function (require, exports, module) {
           codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
           codeWriter.outdent();
           codeWriter.writeLine('end');
-          if (i !== len - 1) {
+          if (i !== publicAttributeLastIndex) {
+            codeWriter.writeLine();
+          }
+        }
+      }
+    } else if (type === 'long' && visibility === 'protected') {
+      codeWriter.writeLine();
+      for (var i = 0; i < len; i++) {
+        attributeVisibility = this.getVisibility(element.attributes[i]);
+
+        if (attributeVisibility === 'protected') {
+          codeWriter.writeLine('def ' + element.attributes[i].name);
+          codeWriter.indent();
+          codeWriter.writeLine('@' + element.attributes[i].name);
+          codeWriter.outdent();
+          codeWriter.writeLine('end');
+          codeWriter.writeLine();
+          codeWriter.writeLine('def ' + element.attributes[i].name + '=(value)');
+          codeWriter.indent();
+          codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
+          codeWriter.outdent();
+          codeWriter.writeLine('end');
+          if (i !== protectedAttributeLastIndex) {
+            codeWriter.writeLine();
+          }
+        }
+      }
+    } else if (type === 'long' && visibility === 'private') {
+      codeWriter.writeLine();
+      for (var i = 0; i < len; i++) {
+        attributeVisibility = this.getVisibility(element.attributes[i]);
+
+        if (attributeVisibility === 'private') {
+          codeWriter.writeLine('def ' + element.attributes[i].name);
+          codeWriter.indent();
+          codeWriter.writeLine('@' + element.attributes[i].name);
+          codeWriter.outdent();
+          codeWriter.writeLine('end');
+          codeWriter.writeLine();
+          codeWriter.writeLine('def ' + element.attributes[i].name + '=(value)');
+          codeWriter.indent();
+          codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
+          codeWriter.outdent();
+          codeWriter.writeLine('end');
+          if (i !== privateAttributeLastIndex) {
             codeWriter.writeLine();
           }
         }
@@ -184,39 +287,96 @@ define(function (require, exports, module) {
       }
 
       terms += '\n';
+      terms += indentationSpaces + indentationSpaces;
       if (methodVisibility === 'public') {
-        terms += indentationSpaces + 'end';
+        terms += '# TODO(person name): Implement this method here.\n';
       } else {
         terms += indentationSpaces;
-        terms += indentationSpaces + 'end';
+        terms += '# TODO(person name): Implement this method here.\n';
+        terms += indentationSpaces;
       }
+
+      terms += indentationSpaces + 'end';
     }
 
     return terms;
   }
 
-  RubyCodeGenerator.prototype.writeMethod = function (codeWriter, publicTerms, protectedTerms, privateTerms) {
+  RubyCodeGenerator.prototype.writeMethod = function (publicTerms, protectedTerms, privateTerms, codeWriter, element, options) {
     if (publicTerms.length) {
-      codeWriter.writeLine();
       codeWriter.writeLine(publicTerms);
     }
 
-    if (protectedTerms.length) {
+    if (this.countAttributeByVisibility('protected', element)) {
       codeWriter.indent();
       codeWriter.writeLine('protected');
-      codeWriter.writeLine();
-      codeWriter.writeLine(protectedTerms);
+      codeWriter.indent();
+      if (options.useAttributeAccessor) {
+        this.writeAttributeAccessor('short', 'protected', codeWriter, element);
+        codeWriter.writeLine();
+      } else if (!options.useAttributeAccessor) {
+        this.writeAttributeAccessor('long', 'protected', codeWriter, element);
+        codeWriter.writeLine();
+      }
+
+      codeWriter.outdent();
+      if (protectedTerms.length) {
+        codeWriter.writeLine(protectedTerms);
+        codeWriter.outdent();
+      }
+
       codeWriter.outdent();
     }
 
-    if (privateTerms.length) {
+    if (this.countAttributeByVisibility('private', element)) {
       codeWriter.indent();
       codeWriter.writeLine('private');
-      codeWriter.writeLine();
-      codeWriter.writeLine(privateTerms);
+      codeWriter.indent();
+      if (options.useAttributeAccessor) {
+        this.writeAttributeAccessor('short', 'private', codeWriter, element);
+        codeWriter.writeLine();
+      } else if (!options.useAttributeAccessor) {
+        this.writeAttributeAccessor('long', 'private', codeWriter, element);
+        codeWriter.writeLine();
+      }
+
+      codeWriter.outdent();
+      if (privateTerms.length) {
+        codeWriter.writeLine(privateTerms);
+        codeWriter.outdent();
+      }
+
       codeWriter.outdent();
     }
   };
+
+  RubyCodeGenerator.prototype.countAttributeByVisibility = function (visibility, element) {
+    var publicElementCount = 0;
+    var protectedElementCount = 0;
+    var privateElementCount = 0;
+    var len = element.attributes.length;
+    var elementVisibility;
+
+    for (var i = 0; i < len; i++) {
+      elementVisibility = this.getVisibility(element.attributes[i]);
+
+      if (elementVisibility === 'public') {
+        publicElementCount++;
+      } else if (elementVisibility === 'protected') {
+        protectedElementCount++;
+      } else if (elementVisibility === 'private') {
+        privateElementCount++;
+      }
+    }
+
+    if (visibility === 'public') {
+      return publicElementCount;
+    } else if (visibility === 'protected') {
+      return protectedElementCount;
+    } else if (visibility === 'private') {
+      return privateElementCount;
+    }
+  }
 
   RubyCodeGenerator.prototype.writeToStringMethod = function (codeWriter) {
     codeWriter.indent();
@@ -241,16 +401,19 @@ define(function (require, exports, module) {
     codeWriter.writeLine(terms.join(' '));
     codeWriter.indent();
 
-    if (options.useAttributeAccessor) {
-      this.writeAttributeAccessor('short', codeWriter, element, options);
+    if (options.useAttributeAccessor && this.countAttributeByVisibility('public', element)) {
+      this.writeAttributeAccessor('short', 'public', codeWriter, element);
+      codeWriter.writeLine();
     }
 
     if (options.initializeMethod) {
       this.writeConstructor(codeWriter, element, options);
+      codeWriter.writeLine();
     }
 
-    if (!options.useAttributeAccessor) {
-      this.writeAttributeAccessor('long', codeWriter, element, options);
+    if (!options.useAttributeAccessor && this.countAttributeByVisibility('public', element)) {
+      this.writeAttributeAccessor('long', 'public', codeWriter, element);
+      codeWriter.writeLine();
     }
 
     codeWriter.outdent();
@@ -307,13 +470,9 @@ define(function (require, exports, module) {
       }
     }
 
-    this.writeMethod(codeWriter, publicTerms, protectedTerms, privateTerms);
+    this.writeMethod(publicTerms, protectedTerms, privateTerms, codeWriter, element, options);
 
     if (options.rubyToStringMethod) {
-      if (len === 0) {
-        codeWriter.writeLine();
-      }
-
       this.writeToStringMethod(codeWriter);
     }
 
@@ -324,6 +483,7 @@ define(function (require, exports, module) {
   function generate(baseModel, basePath, options) {
     var result = new $.Deferred();
     var rubyCodeGenerator = new RubyCodeGenerator(baseModel, basePath);
+
     return rubyCodeGenerator.generate(baseModel, basePath, options);
   }
 
