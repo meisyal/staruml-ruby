@@ -307,7 +307,7 @@ define(function (require, exports, module) {
       codeWriter.writeLine(publicTerms);
     }
 
-    if (this.countAttributeByVisibility('protected', element)) {
+    if (this.countAttributeByVisibility('protected', element) || protectedTerms.length) {
       codeWriter.indent();
       codeWriter.writeLine('protected');
       codeWriter.indent();
@@ -328,7 +328,7 @@ define(function (require, exports, module) {
       codeWriter.outdent();
     }
 
-    if (this.countAttributeByVisibility('private', element)) {
+    if (this.countAttributeByVisibility('private', element) || privateTerms.length) {
       codeWriter.indent();
       codeWriter.writeLine('private');
       codeWriter.indent();
