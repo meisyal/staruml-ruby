@@ -311,12 +311,14 @@ define(function (require, exports, module) {
       codeWriter.indent();
       codeWriter.writeLine('protected');
       codeWriter.indent();
-      if (options.useAttributeAccessor) {
-        this.writeAttributeAccessor('short', 'protected', codeWriter, element);
-        codeWriter.writeLine();
-      } else if (!options.useAttributeAccessor) {
-        this.writeAttributeAccessor('long', 'protected', codeWriter, element);
-        codeWriter.writeLine();
+      if (this.countAttributeByVisibility('protected', element)) {
+        if (options.useAttributeAccessor) {
+          this.writeAttributeAccessor('short', 'protected', codeWriter, element);
+          codeWriter.writeLine();
+        } else if (!options.useAttributeAccessor) {
+          this.writeAttributeAccessor('long', 'protected', codeWriter, element);
+          codeWriter.writeLine();
+        }
       }
 
       codeWriter.outdent();
@@ -332,12 +334,14 @@ define(function (require, exports, module) {
       codeWriter.indent();
       codeWriter.writeLine('private');
       codeWriter.indent();
-      if (options.useAttributeAccessor) {
-        this.writeAttributeAccessor('short', 'private', codeWriter, element);
-        codeWriter.writeLine();
-      } else if (!options.useAttributeAccessor) {
-        this.writeAttributeAccessor('long', 'private', codeWriter, element);
-        codeWriter.writeLine();
+      if (this.countAttributeByVisibility('private', element)) {
+        if (options.useAttributeAccessor) {
+          this.writeAttributeAccessor('short', 'private', codeWriter, element);
+          codeWriter.writeLine();
+        } else if (!options.useAttributeAccessor) {
+          this.writeAttributeAccessor('long', 'private', codeWriter, element);
+          codeWriter.writeLine();
+        }
       }
 
       codeWriter.outdent();
