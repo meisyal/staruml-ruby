@@ -264,55 +264,17 @@ define(function (require, exports, module) {
     }
   };
 
-  RubyCodeGenerator.prototype.constructMethod = function (codeWriter, element, options) {
-    if (element.name.length) {
-      var parameters = element.getNonReturnParameters();
-      var len = parameters.length;
-      var methodVisibility = this.getVisibility(element);
-      var indentationSpaces = this.getIndentString(options);
-      var terms = '';
-
-      terms += indentationSpaces;
-      terms += 'def ' + element.name;
-      if (len !== 0) {
-        terms += '(';
-        for (var i = 0; i < len; i++) {
-          terms += parameters[i].name;
-          if (i !== len - 1) {
-            terms += ', ';
-          } else {
-            terms += ')';
-          }
-        }
-      }
-
-      terms += '\n';
-      terms += indentationSpaces + indentationSpaces;
-      if (methodVisibility === 'public') {
-        terms += '# TODO(person name): Implement this method here.\n';
-      } else {
-        terms += indentationSpaces;
-        terms += '# TODO(person name): Implement this method here.\n';
-        terms += indentationSpaces;
-      }
-
-      terms += indentationSpaces + 'end';
-    }
-
-    return terms;
-  }
-
-  RubyCodeGenerator.prototype.constructPublicMethod = function (codeWriter, element) {
-    var terms = [];
+  RubyCodeGenerator.prototype.writeMethod = function (visibility, codeWriter, element) {
     var len = element.operations.length;
+    var terms = [];
 
     for (var i = 0; i < len; i++) {
       var methodVisibility = this.getVisibility(element.operations[i]);
       var parameters = element.operations[i].getNonReturnParameters();
       var parametersLength = parameters.length;
 
-      if (methodVisibility === 'public') {
-        terms.push('def ' + element.name);
+      if (methodVisibility === visibility) {
+        terms.push('def ' + element.operations[i].name);
         if (parametersLength !== 0) {
           terms.push('(');
           for (var j = 0; j < parametersLength; j++) {
@@ -334,14 +296,14 @@ define(function (require, exports, module) {
         codeWriter.writeLine();
       }
     }
-  }
+  };
 
-  RubyCodeGenerator.prototype.writeMethod = function (protectedTerms, privateTerms, codeWriter, element, options) {
+  RubyCodeGenerator.prototype.writeMethodByVisibility = function (codeWriter, element, options) {
     codeWriter.indent();
-    this.constructPublicMethod(codeWriter, element);
+    this.writeMethod('public', codeWriter, element);
     codeWriter.outdent();
 
-    if (this.countAttributeByVisibility('protected', element) || protectedTerms.length) {
+    if (this.countAttributeByVisibility('protected', element)) {
       codeWriter.indent();
       codeWriter.writeLine('protected');
       codeWriter.indent();
@@ -356,15 +318,12 @@ define(function (require, exports, module) {
       }
 
       codeWriter.outdent();
-      if (protectedTerms.length) {
-        codeWriter.writeLine(protectedTerms);
-        codeWriter.outdent();
-      }
-
+      this.writeMethod('protected', codeWriter, element);
+      codeWriter.outdent();
       codeWriter.outdent();
     }
 
-    if (this.countAttributeByVisibility('private', element) || privateTerms.length) {
+    if (this.countAttributeByVisibility('private', element)) {
       codeWriter.indent();
       codeWriter.writeLine('private');
       codeWriter.indent();
@@ -379,11 +338,8 @@ define(function (require, exports, module) {
       }
 
       codeWriter.outdent();
-      if (privateTerms.length) {
-        codeWriter.writeLine(privateTerms);
-        codeWriter.outdent();
-      }
-
+      this.writeMethod('private', codeWriter, element);
+      codeWriter.outdent();
       codeWriter.outdent();
     }
   };
@@ -414,7 +370,7 @@ define(function (require, exports, module) {
     } else if (visibility === 'private') {
       return privateElementCount;
     }
-  }
+  };
 
   RubyCodeGenerator.prototype.writeToStringMethod = function (codeWriter) {
     codeWriter.indent();
@@ -423,7 +379,7 @@ define(function (require, exports, module) {
     codeWriter.writeLine('\"Your string representation of the object will be written here.\"');
     codeWriter.outdent();
     codeWriter.writeLine('end');
-  }
+  };
 
   RubyCodeGenerator.prototype.writeClass = function (codeWriter, element, options) {
     var terms = [];
@@ -470,34 +426,7 @@ define(function (require, exports, module) {
       }
     }
 
-    var protectedTerms = '';
-    var privateTerms = '';
-
-    for (var i = 0; i < len; i++) {
-      var methodVisibility = this.getVisibility(element.operations[i]);
-      var methodString = this.constructMethod(codeWriter, element.operations[i], options);
-      var indentationSpaces = this.getIndentString(options);
-
-      if (methodVisibility === 'protected') {
-        protectedTerms += methodString;
-        if (i === protectedMethodLastIndex) {
-          protectedTerms += '\n';
-        } else {
-          protectedTerms += '\n\n';
-          protectedTerms += indentationSpaces;
-        }
-      } else if (methodVisibility === 'private') {
-        privateTerms += methodString;
-        if (i === privateMethodLastIndex) {
-          privateTerms += '\n';
-        } else {
-          privateTerms += '\n\n';
-          privateTerms += indentationSpaces;
-        }
-      }
-    }
-
-    this.writeMethod(protectedTerms, privateTerms, codeWriter, element, options);
+    this.writeMethodByVisibility(codeWriter, element, options);
 
     if (options.rubyToStringMethod) {
       this.writeToStringMethod(codeWriter);
