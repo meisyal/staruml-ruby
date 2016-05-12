@@ -299,11 +299,13 @@ define(function (require, exports, module) {
   };
 
   RubyCodeGenerator.prototype.writeMethodByVisibility = function (codeWriter, element, options) {
-    codeWriter.indent();
-    this.writeMethod('public', codeWriter, element);
-    codeWriter.outdent();
+    if (this.countMethodByVisibility('public', element)) {
+      codeWriter.indent();
+      this.writeMethod('public', codeWriter, element);
+      codeWriter.outdent();
+    }
 
-    if (this.countAttributeByVisibility('protected', element)) {
+    if (this.countAttributeByVisibility('protected', element) || this.countMethodByVisibility('protected', element)) {
       codeWriter.indent();
       codeWriter.writeLine('protected');
       codeWriter.indent();
@@ -318,12 +320,15 @@ define(function (require, exports, module) {
       }
 
       codeWriter.outdent();
-      this.writeMethod('protected', codeWriter, element);
+      if (this.countMethodByVisibility('protected', element)) {
+        this.writeMethod('protected', codeWriter, element);
+      }
+
       codeWriter.outdent();
       codeWriter.outdent();
     }
 
-    if (this.countAttributeByVisibility('private', element)) {
+    if (this.countAttributeByVisibility('private', element) | this.countMethodByVisibility('private', element)) {
       codeWriter.indent();
       codeWriter.writeLine('private');
       codeWriter.indent();
@@ -338,7 +343,10 @@ define(function (require, exports, module) {
       }
 
       codeWriter.outdent();
-      this.writeMethod('private', codeWriter, element);
+      if (this.countMethodByVisibility('private', element)) {
+        this.writeMethod('private', codeWriter, element);
+      }
+
       codeWriter.outdent();
       codeWriter.outdent();
     }
@@ -370,6 +378,37 @@ define(function (require, exports, module) {
     } else if (visibility === 'private') {
       return privateElementCount;
     }
+  };
+
+  RubyCodeGenerator.prototype.countMethodByVisibility = function (visibility, element) {
+    var publicMethodCount = 0;
+    var protectedMethodCount = 0;
+    var privateMethodCount = 0;
+    var len = element.operations.length;
+    var methodVisibility;
+    var methodCount = 0;
+
+    for (var i = 0; i < len; i++) {
+      methodVisibility = this.getVisibility(element.operations[i]);
+
+      if (methodVisibility === 'public') {
+        publicMethodCount++;
+      } else if (methodVisibility === 'protected') {
+        protectedMethodCount++;
+      } else if (methodVisibility === 'private') {
+        privateMethodCount++;
+      }
+
+      if (visibility === 'public') {
+        methodCount = publicMethodCount;
+      } else if (visibility === 'protected') {
+        methodCount = protectedMethodCount;
+      } else if (visibility === 'private') {
+        methodCount = privateMethodCount;
+      }
+    }
+
+    return methodCount;
   };
 
   RubyCodeGenerator.prototype.writeToStringMethod = function (codeWriter) {
@@ -411,21 +450,6 @@ define(function (require, exports, module) {
     }
 
     codeWriter.outdent();
-
-    var len = element.operations.length;
-    var protectedMethodLastIndex;
-    var privateMethodLastIndex;
-
-    for (var i = 0; i < len; i++) {
-      var methodVisibility = this.getVisibility(element.operations[i]);
-
-      if (methodVisibility === 'protected') {
-        protectedMethodLastIndex = i;
-      } else if (methodVisibility === 'private') {
-        privateMethodLastIndex = i;
-      }
-    }
-
     this.writeMethodByVisibility(codeWriter, element, options);
 
     if (options.rubyToStringMethod) {
