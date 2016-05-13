@@ -218,7 +218,6 @@ define(function (require, exports, module) {
         }
       }
     } else if (type === 'long' && visibility === 'protected') {
-      codeWriter.writeLine();
       for (var i = 0; i < len; i++) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
@@ -240,7 +239,6 @@ define(function (require, exports, module) {
         }
       }
     } else if (type === 'long' && visibility === 'private') {
-      codeWriter.writeLine();
       for (var i = 0; i < len; i++) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
@@ -321,10 +319,11 @@ define(function (require, exports, module) {
 
       codeWriter.outdent();
       if (this.countMethodByVisibility('protected', element)) {
+        codeWriter.indent();
         this.writeMethod('protected', codeWriter, element);
+        codeWriter.outdent();
       }
 
-      codeWriter.outdent();
       codeWriter.outdent();
     }
 
@@ -344,10 +343,11 @@ define(function (require, exports, module) {
 
       codeWriter.outdent();
       if (this.countMethodByVisibility('private', element)) {
+        codeWriter.indent();
         this.writeMethod('private', codeWriter, element);
+        codeWriter.outdent();
       }
 
-      codeWriter.outdent();
       codeWriter.outdent();
     }
   };
