@@ -358,6 +358,7 @@ define(function (require, exports, module) {
     var privateElementCount = 0;
     var len = element.attributes.length;
     var elementVisibility;
+    var attributeCount = 0;
 
     for (var i = 0; i < len; i++) {
       elementVisibility = this.getVisibility(element.attributes[i]);
@@ -372,12 +373,14 @@ define(function (require, exports, module) {
     }
 
     if (visibility === 'public') {
-      return publicElementCount;
+      attributeCount = publicElementCount;
     } else if (visibility === 'protected') {
-      return protectedElementCount;
+      attributeCount = protectedElementCount;
     } else if (visibility === 'private') {
-      return privateElementCount;
+      attributeCount = privateElementCount;
     }
+
+    return attributeCount;
   };
 
   RubyCodeGenerator.prototype.countMethodByVisibility = function (visibility, element) {
