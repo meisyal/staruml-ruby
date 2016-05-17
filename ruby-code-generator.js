@@ -110,6 +110,22 @@ define(function (require, exports, module) {
     });
   };
 
+  RubyCodeGenerator.prototype.writeDocumentation = function (codeWriter, text) {
+    var lines;
+
+    if (text.trim().length) {
+      lines = text.trim().split('\n');
+      if (lines > 1) {
+        codeWriter.writeLine('#');
+        for (var i = 0; i < lines.length; i++) {
+          codeWriter.writeLine(' ' + lines[i]);
+        }
+      } else {
+        codeWriter.writeLine(' ' + lines[0]);
+      }
+    }
+  };
+
   RubyCodeGenerator.prototype.writeConstructor = function (codeWriter, element, options) {
     if (element.name.length) {
       var terms = [];
