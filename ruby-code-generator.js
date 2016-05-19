@@ -121,7 +121,7 @@ define(function (require, exports, module) {
           codeWriter.writeLine(' ' + lines[i]);
         }
       } else {
-        codeWriter.writeLine(' ' + lines[0]);
+        codeWriter.writeLine('# ' + lines[0]);
       }
     }
   };
@@ -288,6 +288,7 @@ define(function (require, exports, module) {
       var parametersLength = parameters.length;
 
       if (methodVisibility === visibility) {
+        this.writeDocumentation(codeWriter, element.operations[i].documentation);
         terms.push('def ' + element.operations[i].name);
         if (parametersLength !== 0) {
           terms.push('(');
@@ -442,6 +443,7 @@ define(function (require, exports, module) {
   RubyCodeGenerator.prototype.writeClass = function (codeWriter, element, options) {
     var terms = [];
 
+    this.writeDocumentation(codeWriter, element.documentation);
     terms.push('class');
     terms.push(element.name);
 
