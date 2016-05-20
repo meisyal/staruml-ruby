@@ -176,6 +176,7 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'public') {
+          this.writeDocumentation(codeWriter, element.attributes[i].documentation);
           terms.push(':' + element.attributes[i].name);
           if (i !== publicAttributeLastIndex) {
             terms.push(', ');
@@ -190,6 +191,7 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'protected') {
+          this.writeDocumentation(codeWriter, element.attributes[i].documentation);
           terms.push(':' + element.attributes[i].name);
           if (i !== protectedAttributeLastIndex) {
             terms.push(', ');
@@ -204,6 +206,7 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'private') {
+          this.writeDocumentation(codeWriter, element.attributes[i].documentation);
           terms.push(':' + element.attributes[i].name);
           if (i !== privateAttributeLastIndex) {
             terms.push(', ');
