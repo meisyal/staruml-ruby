@@ -42,6 +42,12 @@ define(function (require, exports, module) {
       type: 'Check',
       default: true,
     },
+    'ruby.gen.documentation': {
+      text: 'Documentation',
+      description: 'Generate documentation of class elements.',
+      type: 'Check',
+      default: true,
+    },
   };
 
   function getId() {
@@ -55,6 +61,7 @@ define(function (require, exports, module) {
       initializeMethod: PreferenceManager.get('ruby.gen.initializeMethod'),
       useAttributeAccessor: PreferenceManager.get('ruby.gen.useAttributeAccessor'),
       rubyToStringMethod: PreferenceManager.get('ruby.gen.toStringMethod'),
+      documentation: PreferenceManager.get('ruby.gen.documentation'),
     };
   }
 
