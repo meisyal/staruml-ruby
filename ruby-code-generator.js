@@ -55,6 +55,7 @@ define(function (require, exports, module) {
         codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
         var moduleName = this.writePackage(codeWriter, element);
         if (moduleName) {
+          this.writeDocumentation(codeWriter, element._parent.documentation);
           codeWriter.writeLine('module ' + moduleName);
           codeWriter.indent();
         }
