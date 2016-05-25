@@ -55,7 +55,7 @@ define(function (require, exports, module) {
         codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
         var moduleName = this.writePackage(codeWriter, element);
         if (moduleName) {
-          this.writeDocumentation(codeWriter, element._parent.documentation);
+          this.writeDocumentation(codeWriter, element._parent.documentation, options);
           codeWriter.writeLine('module ' + moduleName);
           codeWriter.indent();
         }
@@ -111,10 +111,10 @@ define(function (require, exports, module) {
     });
   };
 
-  RubyCodeGenerator.prototype.writeDocumentation = function (codeWriter, text) {
+  RubyCodeGenerator.prototype.writeDocumentation = function (codeWriter, text, options) {
     var lines;
 
-    if (text.trim().length) {
+    if (options.documentation && text.trim().length) {
       lines = text.trim().split('\n');
       if (lines > 1) {
         codeWriter.writeLine('#');
@@ -177,7 +177,7 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'public') {
-          this.writeDocumentation(codeWriter, element.attributes[i].documentation);
+          this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
           terms.push(':' + element.attributes[i].name);
           if (i !== publicAttributeLastIndex) {
             terms.push(', ');
@@ -192,7 +192,7 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'protected') {
-          this.writeDocumentation(codeWriter, element.attributes[i].documentation);
+          this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
           terms.push(':' + element.attributes[i].name);
           if (i !== protectedAttributeLastIndex) {
             terms.push(', ');
@@ -207,7 +207,7 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'private') {
-          this.writeDocumentation(codeWriter, element.attributes[i].documentation);
+          this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
           terms.push(':' + element.attributes[i].name);
           if (i !== privateAttributeLastIndex) {
             terms.push(', ');
@@ -292,7 +292,7 @@ define(function (require, exports, module) {
       var parametersLength = parameters.length;
 
       if (methodVisibility === visibility) {
-        this.writeDocumentation(codeWriter, element.operations[i].documentation);
+        this.writeDocumentation(codeWriter, element.operations[i].documentation, options);
         terms.push('def ' + element.operations[i].name);
         if (parametersLength !== 0) {
           terms.push('(');
@@ -447,7 +447,7 @@ define(function (require, exports, module) {
   RubyCodeGenerator.prototype.writeClass = function (codeWriter, element, options) {
     var terms = [];
 
-    this.writeDocumentation(codeWriter, element.documentation);
+    this.writeDocumentation(codeWriter, element.documentation, options);
     terms.push('class');
     terms.push(element.name);
 
