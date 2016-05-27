@@ -127,7 +127,7 @@ define(function (require, exports, module) {
     }
   };
 
-  RubyCodeGenerator.prototype.writeConstructor = function (codeWriter, element, options) {
+  RubyCodeGenerator.prototype.writeConstructor = function (codeWriter, element) {
     if (element.name.length) {
       var terms = [];
       var len = element.attributes.length;
@@ -151,7 +151,7 @@ define(function (require, exports, module) {
     }
   };
 
-  RubyCodeGenerator.prototype.writeAttributeAccessor = function (type, visibility, codeWriter, element) {
+  RubyCodeGenerator.prototype.writeAttributeAccessor = function (type, visibility, codeWriter, element, options) {
     var terms = [];
     var len = element.attributes.length;
     var attributeVisibility;
@@ -282,7 +282,7 @@ define(function (require, exports, module) {
     }
   };
 
-  RubyCodeGenerator.prototype.writeMethod = function (visibility, codeWriter, element) {
+  RubyCodeGenerator.prototype.writeMethod = function (visibility, codeWriter, element, options) {
     var len = element.operations.length;
     var terms = [];
 
@@ -328,7 +328,7 @@ define(function (require, exports, module) {
 
     if (publicMethodLength) {
       codeWriter.indent();
-      this.writeMethod('public', codeWriter, element);
+      this.writeMethod('public', codeWriter, element, options);
       codeWriter.outdent();
     }
 
@@ -338,10 +338,10 @@ define(function (require, exports, module) {
       codeWriter.indent();
       if (protectedAttributeLength) {
         if (options.useAttributeAccessor) {
-          this.writeAttributeAccessor('short', 'protected', codeWriter, element);
+          this.writeAttributeAccessor('short', 'protected', codeWriter, element, options);
           codeWriter.writeLine();
         } else if (!options.useAttributeAccessor) {
-          this.writeAttributeAccessor('long', 'protected', codeWriter, element);
+          this.writeAttributeAccessor('long', 'protected', codeWriter, element, options);
           codeWriter.writeLine();
         }
       }
@@ -349,7 +349,7 @@ define(function (require, exports, module) {
       codeWriter.outdent();
       if (protectedMethodLength) {
         codeWriter.indent();
-        this.writeMethod('protected', codeWriter, element);
+        this.writeMethod('protected', codeWriter, element, options);
         codeWriter.outdent();
       }
 
@@ -362,10 +362,10 @@ define(function (require, exports, module) {
       codeWriter.indent();
       if (privateAttributeLength) {
         if (options.useAttributeAccessor) {
-          this.writeAttributeAccessor('short', 'private', codeWriter, element);
+          this.writeAttributeAccessor('short', 'private', codeWriter, element, options);
           codeWriter.writeLine();
         } else if (!options.useAttributeAccessor) {
-          this.writeAttributeAccessor('long', 'private', codeWriter, element);
+          this.writeAttributeAccessor('long', 'private', codeWriter, element, options);
           codeWriter.writeLine();
         }
       }
@@ -373,7 +373,7 @@ define(function (require, exports, module) {
       codeWriter.outdent();
       if (privateMethodLength) {
         codeWriter.indent();
-        this.writeMethod('private', codeWriter, element);
+        this.writeMethod('private', codeWriter, element, options);
         codeWriter.outdent();
       }
 
@@ -462,17 +462,17 @@ define(function (require, exports, module) {
     var attributeCount = this.countAttributeByVisibility(element);
     var publicAttributeLength = attributeCount[0];
     if (options.useAttributeAccessor && publicAttributeLength) {
-      this.writeAttributeAccessor('short', 'public', codeWriter, element);
+      this.writeAttributeAccessor('short', 'public', codeWriter, element, options);
       codeWriter.writeLine();
     }
 
     if (options.initializeMethod) {
-      this.writeConstructor(codeWriter, element, options);
+      this.writeConstructor(codeWriter, element);
       codeWriter.writeLine();
     }
 
     if (!options.useAttributeAccessor && publicAttributeLength) {
-      this.writeAttributeAccessor('long', 'public', codeWriter, element);
+      this.writeAttributeAccessor('long', 'public', codeWriter, element, options);
       codeWriter.writeLine();
     }
 
