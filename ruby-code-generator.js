@@ -221,17 +221,8 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'public') {
-          codeWriter.writeLine('def ' + element.attributes[i].name);
-          codeWriter.indent();
-          codeWriter.writeLine('@' + element.attributes[i].name);
-          codeWriter.outdent();
-          codeWriter.writeLine('end');
-          codeWriter.writeLine();
-          codeWriter.writeLine('def ' + element.attributes[i].name + '=(value)');
-          codeWriter.indent();
-          codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
-          codeWriter.outdent();
-          codeWriter.writeLine('end');
+          this.writeSetterGetterMethod(element.attributes[i].name);
+
           if (i !== publicAttributeLastIndex) {
             codeWriter.writeLine();
           }
@@ -242,17 +233,8 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'protected') {
-          codeWriter.writeLine('def ' + element.attributes[i].name);
-          codeWriter.indent();
-          codeWriter.writeLine('@' + element.attributes[i].name);
-          codeWriter.outdent();
-          codeWriter.writeLine('end');
-          codeWriter.writeLine();
-          codeWriter.writeLine('def ' + element.attributes[i].name + '=(value)');
-          codeWriter.indent();
-          codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
-          codeWriter.outdent();
-          codeWriter.writeLine('end');
+          this.writeSetterGetterMethod(element.attributes[i].name);
+
           if (i !== protectedAttributeLastIndex) {
             codeWriter.writeLine();
           }
@@ -263,23 +245,28 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'private') {
-          codeWriter.writeLine('def ' + element.attributes[i].name);
-          codeWriter.indent();
-          codeWriter.writeLine('@' + element.attributes[i].name);
-          codeWriter.outdent();
-          codeWriter.writeLine('end');
-          codeWriter.writeLine();
-          codeWriter.writeLine('def ' + element.attributes[i].name + '=(value)');
-          codeWriter.indent();
-          codeWriter.writeLine('@' + element.attributes[i].name + ' = value');
-          codeWriter.outdent();
-          codeWriter.writeLine('end');
+          this.writeSetterGetterMethod(element.attributes[i].name);
+
           if (i !== privateAttributeLastIndex) {
             codeWriter.writeLine();
           }
         }
       }
     }
+  };
+
+  RubyCodeGenerator.prototype.writeSetterGetterMethod = function (elementName) {
+    codeWriter.writeLine('def ' + elementName);
+    codeWriter.indent();
+    codeWriter.writeLine('@' + elementName);
+    codeWriter.outdent();
+    codeWriter.writeLine('end');
+    codeWriter.writeLine();
+    codeWriter.writeLine('def ' + elementName + '=(value)');
+    codeWriter.indent();
+    codeWriter.writeLine('@' + elementName + ' = value');
+    codeWriter.outdent();
+    codeWriter.writeLine('end');
   };
 
   RubyCodeGenerator.prototype.writeMethod = function (visibility, codeWriter, element, options) {
