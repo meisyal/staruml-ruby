@@ -221,7 +221,7 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'public') {
-          this.writeSetterGetterMethod(element.attributes[i].name);
+          this.writeSetterGetterMethod(codeWriter, element.attributes[i].name);
 
           if (i !== publicAttributeLastIndex) {
             codeWriter.writeLine();
@@ -233,7 +233,7 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'protected') {
-          this.writeSetterGetterMethod(element.attributes[i].name);
+          this.writeSetterGetterMethod(codeWriter, element.attributes[i].name);
 
           if (i !== protectedAttributeLastIndex) {
             codeWriter.writeLine();
@@ -245,7 +245,7 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'private') {
-          this.writeSetterGetterMethod(element.attributes[i].name);
+          this.writeSetterGetterMethod(codeWriter, element.attributes[i].name);
 
           if (i !== privateAttributeLastIndex) {
             codeWriter.writeLine();
@@ -255,7 +255,7 @@ define(function (require, exports, module) {
     }
   };
 
-  RubyCodeGenerator.prototype.writeSetterGetterMethod = function (elementName) {
+  RubyCodeGenerator.prototype.writeSetterGetterMethod = function (codeWriter, elementName) {
     codeWriter.writeLine('def ' + elementName);
     codeWriter.indent();
     codeWriter.writeLine('@' + elementName);
