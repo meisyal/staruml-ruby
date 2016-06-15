@@ -269,6 +269,19 @@ define(function (require, exports, module) {
     codeWriter.writeLine('end');
   };
 
+  RubyCodeGenerator.prototype.writeConstant = function (codeWriter, element) {
+    var constantTerms = [];
+    var len = element.attributes.length;
+
+    for (var i = 0; i < len; i++) {
+      if (element.attributes[i].isStatic) {
+        constantTerms.push(element.attributes[i].name + ' = ' + element.attributes[i].defaultValue);
+      }
+    }
+
+    codeWriter.writeLine(constantTerms.join(''));
+  };
+
   RubyCodeGenerator.prototype.writeMethod = function (visibility, codeWriter, element, options) {
     var len = element.operations.length;
     var terms = [];
@@ -452,6 +465,8 @@ define(function (require, exports, module) {
       this.writeAttributeAccessor('short', 'public', codeWriter, element, options);
       codeWriter.writeLine();
     }
+
+    this.writeConstant(codeWriter, element);
 
     if (options.initializeMethod) {
       this.writeConstructor(codeWriter, element);
