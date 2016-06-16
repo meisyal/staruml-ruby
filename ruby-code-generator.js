@@ -134,16 +134,20 @@ define(function (require, exports, module) {
 
       terms.push('def initialize(');
       for (var i = 0; i < len; i++) {
-        terms.push(element.attributes[i].name);
-        if (i !== len - 1) {
-          terms.push(', ');
+        if (!element.attributes[i].isStatic) {
+          terms.push(element.attributes[i].name);
+          if (i !== len - 1) {
+            terms.push(', ');
+          }
         }
       }
 
       codeWriter.writeLine(terms.join('') + ')');
       codeWriter.indent();
       for (var j = 0; j < len; j++) {
-        codeWriter.writeLine('@' + element.attributes[j].name + ' = ' + element.attributes[j].name);
+        if (!element.attributes[j].isStatic) {
+          codeWriter.writeLine('@' + element.attributes[j].name + ' = ' + element.attributes[j].name);
+        }
       }
 
       codeWriter.outdent();
@@ -176,7 +180,7 @@ define(function (require, exports, module) {
       for (var i = 0; i < len; i++) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
-        if (attributeVisibility === 'public') {
+        if (attributeVisibility === 'public' && !element.attributes[i].isStatic) {
           this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
           terms.push(':' + element.attributes[i].name);
           if (i !== publicAttributeLastIndex) {
@@ -220,7 +224,7 @@ define(function (require, exports, module) {
       for (var i = 0; i < len; i++) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
-        if (attributeVisibility === 'public') {
+        if (attributeVisibility === 'public' && !element.attributes[i].isStatic) {
           this.writeSetterGetterMethod(codeWriter, element.attributes[i].name);
 
           if (i !== publicAttributeLastIndex) {
