@@ -412,6 +412,19 @@ define(function (require, exports, module) {
     return attributeCount;
   };
 
+  RubyCodeGenerator.prototype.countStaticAttribute = function (element) {
+    var staticAttributeCount = 0;
+    var len = element.attributes.length;
+
+    for (var i = 0; i < len; i++) {
+      if (element.attributes[i].isStatic) {
+        staticAttributeCount++;
+      }
+    }
+
+    return staticAttributeCount;
+  };
+
   RubyCodeGenerator.prototype.countMethodByVisibility = function (element) {
     var publicMethodCount = 0;
     var protectedMethodCount = 0;
@@ -450,6 +463,7 @@ define(function (require, exports, module) {
 
   RubyCodeGenerator.prototype.writeClass = function (codeWriter, element, options) {
     var terms = [];
+    var staticAttributeCount = this.countStaticAttribute(element);
 
     this.writeDocumentation(codeWriter, element.documentation, options);
     terms.push('class');
@@ -470,7 +484,10 @@ define(function (require, exports, module) {
       codeWriter.writeLine();
     }
 
-    this.writeConstant(codeWriter, element);
+    if (staticAttributeCount) {
+      this.writeConstant(codeWriter, element);
+      codeWriter.writeLine();
+    }
 
     if (options.initializeMethod) {
       this.writeConstructor(codeWriter, element);
