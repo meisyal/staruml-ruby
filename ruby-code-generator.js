@@ -396,7 +396,7 @@ define(function (require, exports, module) {
     for (var i = 0; i < len; i++) {
       elementVisibility = this.getVisibility(element.attributes[i]);
 
-      if (elementVisibility === 'public') {
+      if (elementVisibility === 'public' && !element.attributes[i].isStatic) {
         publicElementCount++;
       } else if (elementVisibility === 'protected') {
         protectedElementCount++;
@@ -481,7 +481,9 @@ define(function (require, exports, module) {
     var publicAttributeLength = attributeCount[0];
     if (options.useAttributeAccessor && publicAttributeLength) {
       this.writeAttributeAccessor('short', 'public', codeWriter, element, options);
-      codeWriter.writeLine();
+      if (!staticAttributeCount) {
+        codeWriter.writeLine();
+      }
     }
 
     if (staticAttributeCount) {
