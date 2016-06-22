@@ -106,6 +106,7 @@ define(function (require, exports, module) {
     var inheritances = Repository.getRelationshipsOf(element, function (relationship) {
       return (relationship instanceof type.UMLGeneralization && relationship.source === element);
     });
+
     return _.map(inheritances, function (inherit) {
       return inherit.target;
     });
@@ -210,7 +211,7 @@ define(function (require, exports, module) {
       for (var i = 0; i < len; i++) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
-        if (attributeVisibility === 'private') {
+        if (attributeVisibility === 'private' && !element.attributes[i].isStatic) {
           this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
           terms.push(':' + element.attributes[i].name);
           if (i !== privateAttributeLastIndex) {
@@ -248,7 +249,7 @@ define(function (require, exports, module) {
       for (var i = 0; i < len; i++) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
-        if (attributeVisibility === 'private') {
+        if (attributeVisibility === 'private' && !element.attributes[i].isStatic) {
           this.writeSetterGetterMethod(codeWriter, element.attributes[i].name);
 
           if (i !== privateAttributeLastIndex) {
@@ -280,6 +281,9 @@ define(function (require, exports, module) {
     for (var i = 0; i < len; i++) {
       if (element.attributes[i].isStatic) {
         constantTerms.push(element.attributes[i].name + ' = ' + element.attributes[i].defaultValue);
+        if (this.getVisibility(element.attributes[i]) === 'private') {
+          constantTerms.push('private_constant :' + element.attributes[i].name);
+        }
       }
     }
 
@@ -400,7 +404,7 @@ define(function (require, exports, module) {
         publicElementCount++;
       } else if (elementVisibility === 'protected') {
         protectedElementCount++;
-      } else if (elementVisibility === 'private') {
+      } else if (elementVisibility === 'private' && !element.attributes[i].isStatic) {
         privateElementCount++;
       }
     }
