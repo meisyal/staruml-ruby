@@ -275,19 +275,16 @@ define(function (require, exports, module) {
   };
 
   RubyCodeGenerator.prototype.writeConstant = function (codeWriter, element) {
-    var constantTerms = [];
     var len = element.attributes.length;
 
     for (var i = 0; i < len; i++) {
       if (element.attributes[i].isStatic) {
-        constantTerms.push(element.attributes[i].name + ' = ' + element.attributes[i].defaultValue);
+        codeWriter.writeLine(element.attributes[i].name + ' = ' + element.attributes[i].defaultValue);
         if (this.getVisibility(element.attributes[i]) === 'private') {
-          constantTerms.push('private_constant :' + element.attributes[i].name);
+          codeWriter.writeLine('private_constant :' + element.attributes[i].name);
         }
       }
     }
-
-    codeWriter.writeLine(constantTerms.join(''));
   };
 
   RubyCodeGenerator.prototype.writeMethod = function (visibility, codeWriter, element, options) {
@@ -316,6 +313,7 @@ define(function (require, exports, module) {
 
         codeWriter.writeLine(terms.join(''));
         terms.length = 0;
+
         codeWriter.indent();
         codeWriter.writeLine('# TODO(person name): Implement this method here.');
         codeWriter.outdent();
