@@ -137,10 +137,12 @@ define(function (require, exports, module) {
       for (var i = 0; i < len; i++) {
         if (!element.attributes[i].isStatic) {
           terms.push(element.attributes[i].name);
-          if (i !== len - 1) {
-            terms.push(', ');
-          }
+          terms.push(', ');
         }
+      }
+
+      if (terms.length > 1) {
+        terms.pop();
       }
 
       codeWriter.writeLine(terms.join('') + ')');
@@ -184,10 +186,12 @@ define(function (require, exports, module) {
         if (attributeVisibility === 'public' && !element.attributes[i].isStatic) {
           this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
           terms.push(':' + element.attributes[i].name);
-          if (i !== publicAttributeLastIndex) {
-            terms.push(', ');
-          }
+          terms.push(', ');
         }
+      }
+
+      if (terms.length > 1) {
+        terms.pop();
       }
 
       codeWriter.writeLine(terms.join(''));
@@ -199,10 +203,12 @@ define(function (require, exports, module) {
         if (attributeVisibility === 'protected') {
           this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
           terms.push(':' + element.attributes[i].name);
-          if (i !== protectedAttributeLastIndex) {
-            terms.push(', ');
-          }
+          terms.push(', ');
         }
+      }
+
+      if (terms.length > 1) {
+        terms.pop();
       }
 
       codeWriter.writeLine(terms.join(''));
@@ -214,10 +220,12 @@ define(function (require, exports, module) {
         if (attributeVisibility === 'private' && !element.attributes[i].isStatic) {
           this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
           terms.push(':' + element.attributes[i].name);
-          if (i !== privateAttributeLastIndex) {
-            terms.push(', ');
-          }
+          terms.push(', ');
         }
+      }
+
+      if (terms.length > 1) {
+        terms.pop();
       }
 
       codeWriter.writeLine(terms.join(''));
