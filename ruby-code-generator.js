@@ -149,7 +149,8 @@ define(function (require, exports, module) {
       codeWriter.indent();
       for (var j = 0; j < len; j++) {
         if (!element.attributes[j].isStatic) {
-          codeWriter.writeLine('@' + element.attributes[j].name + ' = ' + element.attributes[j].name);
+          codeWriter.writeLine('@' + element.attributes[j].name + ' = ' +
+            element.attributes[j].name);
         }
       }
 
@@ -287,7 +288,8 @@ define(function (require, exports, module) {
 
     for (var i = 0; i < len; i++) {
       if (element.attributes[i].isStatic) {
-        codeWriter.writeLine(element.attributes[i].name + ' = ' + element.attributes[i].defaultValue);
+        codeWriter.writeLine(element.attributes[i].name + ' = ' +
+          element.attributes[i].defaultValue);
         if (this.getVisibility(element.attributes[i]) === 'private') {
           codeWriter.writeLine('private_constant :' + element.attributes[i].name);
         }
