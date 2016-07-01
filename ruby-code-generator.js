@@ -160,7 +160,8 @@ define(function (require, exports, module) {
   };
 
   RubyCodeGenerator.prototype.writeAttributeAccessor = function (type, visibility, codeWriter, element, options) {
-    var terms = [];
+    var accesorAttributeTerms = [];
+    var readerAttributeTerms = [];
     var len = element.attributes.length;
     var attributeVisibility;
     var publicAttributeLastIndex;
@@ -180,56 +181,60 @@ define(function (require, exports, module) {
     }
 
     if (type === 'short' && visibility === 'public') {
-      terms.push('attr_accessor ');
       for (var i = 0; i < len; i++) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'public' && !element.attributes[i].isStatic) {
           this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
-          terms.push(':' + element.attributes[i].name);
-          terms.push(', ');
+          if (element.attributes[i].isReadOnly) {
+            readerAttributeTerms.push(':' + element.attributes[i].name);
+          } else {
+            accesorAttributeTerms.push(':' + element.attributes[i].name);
+          }
+
+          accesorAttributeTerms.push(', ');
+          readerAttributeTerms.push(', ');
         }
       }
 
-      if (terms.length > 1) {
-        terms.pop();
+      if (accesorAttributeTerms.length > 1 || readerAttributeTerms.length > 1) {
+        accesorAttributeTerms.pop();
+        readerAttributeTerms.pop();
+        codeWriter.writeLine('attr_accessor ' + accesorAttributeTerms.join(''));
+        codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
       }
-
-      codeWriter.writeLine(terms.join(''));
     } else if (type === 'short' && visibility === 'protected') {
-      terms.push('attr_accessor ');
       for (var i = 0; i < len; i++) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'protected') {
           this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
-          terms.push(':' + element.attributes[i].name);
-          terms.push(', ');
+          accesorAttributeTerms.push(':' + element.attributes[i].name);
+          accesorAttributeTerms.push(', ');
         }
       }
 
-      if (terms.length > 1) {
-        terms.pop();
+      if (accesorAttributeTerms.length > 1) {
+        accesorAttributeTerms.pop();
       }
 
-      codeWriter.writeLine(terms.join(''));
+      codeWriter.writeLine('attr_accessor ' + accesorAttributeTerms.join(''));
     } else if (type === 'short' && visibility === 'private') {
-      terms.push('attr_accessor ');
       for (var i = 0; i < len; i++) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'private' && !element.attributes[i].isStatic) {
           this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
-          terms.push(':' + element.attributes[i].name);
-          terms.push(', ');
+          accesorAttributeTerms.push(':' + element.attributes[i].name);
+          accesorAttributeTerms.push(', ');
         }
       }
 
-      if (terms.length > 1) {
-        terms.pop();
+      if (accesorAttributeTerms.length > 1) {
+        accesorAttributeTerms.pop();
       }
 
-      codeWriter.writeLine(terms.join(''));
+      codeWriter.writeLine('attr_accessor '+ accesorAttributeTerms.join(''));
     } else if (type === 'long' && visibility === 'public') {
       for (var i = 0; i < len; i++) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
