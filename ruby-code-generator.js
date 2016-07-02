@@ -209,16 +209,23 @@ define(function (require, exports, module) {
 
         if (attributeVisibility === 'protected') {
           this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
-          accesorAttributeTerms.push(':' + element.attributes[i].name);
+          if (element.attributes[i].isReadOnly) {
+            readerAttributeTerms.push(':' + element.attributes[i].name);
+          } else {
+            accesorAttributeTerms.push(':' + element.attributes[i].name);
+          }
+
           accesorAttributeTerms.push(', ');
+          readerAttributeTerms.push(', ');
         }
       }
 
-      if (accesorAttributeTerms.length > 1) {
+      if (accesorAttributeTerms.length > 1 || readerAttributeTerms.length > 1) {
         accesorAttributeTerms.pop();
+        readerAttributeTerms.pop();
+        codeWriter.writeLine('attr_accessor ' + accesorAttributeTerms.join(''));
+        codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
       }
-
-      codeWriter.writeLine('attr_accessor ' + accesorAttributeTerms.join(''));
     } else if (type === 'short' && visibility === 'private') {
       for (var i = 0; i < len; i++) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
