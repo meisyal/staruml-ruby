@@ -188,19 +188,21 @@ define(function (require, exports, module) {
           this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
           if (element.attributes[i].isReadOnly) {
             readerAttributeTerms.push(':' + element.attributes[i].name);
+            readerAttributeTerms.push(', ');
           } else {
             accesorAttributeTerms.push(':' + element.attributes[i].name);
+            accesorAttributeTerms.push(', ');
           }
-
-          accesorAttributeTerms.push(', ');
-          readerAttributeTerms.push(', ');
         }
       }
 
-      if (accesorAttributeTerms.length > 1 || readerAttributeTerms.length > 1) {
+      if (accesorAttributeTerms.length > 1) {
         accesorAttributeTerms.pop();
-        readerAttributeTerms.pop();
         codeWriter.writeLine('attr_accessor ' + accesorAttributeTerms.join(''));
+      }
+
+      if (readerAttributeTerms.length > 1) {
+        readerAttributeTerms.pop();
         codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
       }
     } else if (type === 'short' && visibility === 'protected') {
@@ -211,19 +213,21 @@ define(function (require, exports, module) {
           this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
           if (element.attributes[i].isReadOnly) {
             readerAttributeTerms.push(':' + element.attributes[i].name);
+            readerAttributeTerms.push(', ');
           } else {
             accesorAttributeTerms.push(':' + element.attributes[i].name);
+            accesorAttributeTerms.push(', ');
           }
-
-          accesorAttributeTerms.push(', ');
-          readerAttributeTerms.push(', ');
         }
       }
 
-      if (accesorAttributeTerms.length > 1 || readerAttributeTerms.length > 1) {
+      if (accesorAttributeTerms.length > 1) {
         accesorAttributeTerms.pop();
-        readerAttributeTerms.pop();
         codeWriter.writeLine('attr_accessor ' + accesorAttributeTerms.join(''));
+      }
+
+      if (readerAttributeTerms.length > 1) {
+        readerAttributeTerms.pop();
         codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
       }
     } else if (type === 'short' && visibility === 'private') {
@@ -234,19 +238,21 @@ define(function (require, exports, module) {
           this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
           if (element.attributes[i].isReadOnly) {
             readerAttributeTerms.push(':' + element.attributes[i].name);
+            readerAttributeTerms.push(', ');
           } else {
             accesorAttributeTerms.push(':' + element.attributes[i].name);
+            accesorAttributeTerms.push(', ');
           }
-
-          accesorAttributeTerms.push(', ');
-          readerAttributeTerms.push(', ');
         }
       }
 
-      if (accesorAttributeTerms.length > 1 || readerAttributeTerms.length > 1) {
+      if (accesorAttributeTerms.length > 1) {
         accesorAttributeTerms.pop();
-        readerAttributeTerms.pop();
         codeWriter.writeLine('attr_accessor ' + accesorAttributeTerms.join(''));
+      }
+
+      if (readerAttributeTerms.length > 1) {
+        readerAttributeTerms.pop();
         codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
       }
     } else if (type === 'long' && visibility === 'public') {
