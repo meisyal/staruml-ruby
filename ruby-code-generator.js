@@ -260,7 +260,7 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'public' && !element.attributes[i].isStatic) {
-          this.writeSetterGetterMethod(codeWriter, element.attributes[i].name);
+          this.writeSetterGetterMethod(codeWriter, element.attributes[i]);
 
           if (i !== publicAttributeLastIndex) {
             codeWriter.writeLine();
@@ -272,7 +272,7 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'protected') {
-          this.writeSetterGetterMethod(codeWriter, element.attributes[i].name);
+          this.writeSetterGetterMethod(codeWriter, element.attributes[i]);
 
           if (i !== protectedAttributeLastIndex) {
             codeWriter.writeLine();
@@ -284,7 +284,7 @@ define(function (require, exports, module) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
 
         if (attributeVisibility === 'private' && !element.attributes[i].isStatic) {
-          this.writeSetterGetterMethod(codeWriter, element.attributes[i].name);
+          this.writeSetterGetterMethod(codeWriter, element.attributes[i]);
 
           if (i !== privateAttributeLastIndex) {
             codeWriter.writeLine();
@@ -294,18 +294,21 @@ define(function (require, exports, module) {
     }
   };
 
-  RubyCodeGenerator.prototype.writeSetterGetterMethod = function (codeWriter, elementName) {
-    codeWriter.writeLine('def ' + elementName);
+  RubyCodeGenerator.prototype.writeSetterGetterMethod = function (codeWriter, attribute) {
+    codeWriter.writeLine('def ' + attribute.name);
     codeWriter.indent();
-    codeWriter.writeLine('@' + elementName);
+    codeWriter.writeLine('@' + attribute.name);
     codeWriter.outdent();
     codeWriter.writeLine('end');
-    codeWriter.writeLine();
-    codeWriter.writeLine('def ' + elementName + '=(value)');
-    codeWriter.indent();
-    codeWriter.writeLine('@' + elementName + ' = value');
-    codeWriter.outdent();
-    codeWriter.writeLine('end');
+
+    if (!attribute.isReadOnly) {
+      codeWriter.writeLine();
+      codeWriter.writeLine('def ' + attribute.name + '=(value)');
+      codeWriter.indent();
+      codeWriter.writeLine('@' + attribute.name + ' = value');
+      codeWriter.outdent();
+      codeWriter.writeLine('end');
+    }
   };
 
   RubyCodeGenerator.prototype.writeConstant = function (codeWriter, element) {
