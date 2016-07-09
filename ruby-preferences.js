@@ -32,7 +32,7 @@ define(function (require, exports, module) {
     },
     'ruby.gen.useAttributeAccessor': {
       text: 'Attribute accessor',
-      description: 'Use attribute accessor rather than set and get attribute methods.',
+      description: 'Use shortcut for attribute accessors (writer and reader).',
       type: 'Check',
       default: false,
     },
