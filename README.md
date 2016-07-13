@@ -11,21 +11,21 @@ StarUML extension repository**.
 
 ### Manual
 
-If you decide to install manually. Please, follow these steps below.
+If you prefer to install manually. Please, follow these steps below.
 
 1. Download the latest package of staruml-ruby [here][release].
 2. Create a new folder `meisyal.starumlruby` in this location. Location depends on
    your operating system.
 
-   * Mac OS X: `~/Library/Application Support/StarUML/extensions/user`
-   * Windows: `C:\Users\<user>\AppData\Roaming\StarUML\extensions\user`
    * Linux: `~/.config/StarUML/extensions/user`
+   * Mac OS: `~/Library/Application Support/StarUML/extensions/user`
+   * Windows: `C:\Users\<user>\AppData\Roaming\StarUML\extensions\user`
 
 3. Extract the package in the new extension folder.
 4. Open or restart StarUML if you have already opened it.
 
 Internet connection is needed before installing extension via StarUML extension
-repository and URL.
+repository or URL.
 
 ### via StarUML extension repository
 
@@ -98,6 +98,11 @@ tool will generate method parameters.
 * the `packagename` folder contains classes that belong to the package.
 * code documentation will be generated at the top of package name.
 
+**Constants**
+
+* tool will generate constants.
+* the constants support public and private constants.
+
 ## How to use this extension
 
 Please, follow these steps below.
@@ -105,8 +110,8 @@ Please, follow these steps below.
 1. Click the menu (**Tools** -> **Ruby** -> **Generate Code...**).
 2. Select a model which will be generated its code in the pop window. And then,
    click **OK**.
-3. Select the location where the generated code will be placed.
-4. The generated code will be generated in the place where you defined before.
+3. Select a location where the generated code will be saved.
+4. The generated code will be saved in the place where you selected before.
 
 ## How to configure this extension
 
