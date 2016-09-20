@@ -505,6 +505,20 @@ define(function (require, exports, module) {
     var terms = [];
     var staticAttributeCount = this.countStaticAttribute(element);
 
+    var associations = Repository.getRelationshipsOf(element, function (relationship) {
+      return (relationship instanceof type.UMLAssociation);
+    });
+
+    for (var i = 0; i < associations.length; i++) {
+      if (associations[i].end1.reference === element && associations[i].end2.navigable === true) {
+        codeWriter.writeLine('require_relative ' + associations[i].end2.reference.name);
+      }
+
+      if (associations[i].end2.reference === element && associations[i].end1.navigable === true) {
+        codeWriter.writeLine('require_relative ' + associations[i].end1.reference.name);
+      }
+    }
+
     this.writeDocumentation(codeWriter, element.documentation, options);
     terms.push('class');
     terms.push(element.name);
