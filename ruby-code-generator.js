@@ -112,6 +112,28 @@ define(function (require, exports, module) {
     });
   };
 
+  RubyCodeGenerator.prototype.writeAssociation = function (codeWriter, element) {
+    var associations = Repository.getRelationshipsOf(element, function (relationship) {
+      return (relationship instanceof type.UMLAssociation);
+    });
+
+    for (var i = 0; i < associations.length; i++) {
+      var association = associations[i];
+
+      if (association.end1.reference === element && association.end2.navigable === true) {
+        var fileName = codeWriter.fileName(association.end2.reference.name);
+
+        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+      }
+
+      if (association.end2.reference === element && association.end1.navigable === true) {
+        var fileName = codeWriter.fileName(association.end1.reference.name);
+
+        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+      }
+    }
+  };
+
   RubyCodeGenerator.prototype.writeDocumentation = function (codeWriter, text, options) {
     var lines;
 
@@ -505,19 +527,7 @@ define(function (require, exports, module) {
     var terms = [];
     var staticAttributeCount = this.countStaticAttribute(element);
 
-    var associations = Repository.getRelationshipsOf(element, function (relationship) {
-      return (relationship instanceof type.UMLAssociation);
-    });
-
-    for (var i = 0; i < associations.length; i++) {
-      if (associations[i].end1.reference === element && associations[i].end2.navigable === true) {
-        codeWriter.writeLine('require_relative ' + associations[i].end2.reference.name);
-      }
-
-      if (associations[i].end2.reference === element && associations[i].end1.navigable === true) {
-        codeWriter.writeLine('require_relative ' + associations[i].end1.reference.name);
-      }
-    }
+    this.writeAssociation(codeWriter, element);
 
     this.writeDocumentation(codeWriter, element.documentation, options);
     terms.push('class');
