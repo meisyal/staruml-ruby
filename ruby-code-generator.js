@@ -131,6 +131,10 @@ define(function (require, exports, module) {
 
         codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
       }
+
+      if (associations.length) {
+        codeWriter.writeLine();
+      }
     }
   };
 
