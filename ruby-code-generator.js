@@ -206,81 +206,8 @@ define(function (require, exports, module) {
       }
     }
 
-    if (type === 'short' && visibility === 'public') {
-      for (var i = 0; i < len; i++) {
-        attributeVisibility = this.getVisibility(element.attributes[i]);
-
-        if (attributeVisibility === 'public' && !element.attributes[i].isStatic) {
-          this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
-          if (element.attributes[i].isReadOnly) {
-            readerAttributeTerms.push(':' + element.attributes[i].name);
-            readerAttributeTerms.push(', ');
-          } else {
-            accesorAttributeTerms.push(':' + element.attributes[i].name);
-            accesorAttributeTerms.push(', ');
-          }
-        }
-      }
-
-      if (accesorAttributeTerms.length > 1) {
-        accesorAttributeTerms.pop();
-        codeWriter.writeLine('attr_accessor ' + accesorAttributeTerms.join(''));
-      }
-
-      if (readerAttributeTerms.length > 1) {
-        readerAttributeTerms.pop();
-        codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
-      }
-    } else if (type === 'short' && visibility === 'protected') {
-      for (var i = 0; i < len; i++) {
-        attributeVisibility = this.getVisibility(element.attributes[i]);
-
-        if (attributeVisibility === 'protected') {
-          this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
-          if (element.attributes[i].isReadOnly) {
-            readerAttributeTerms.push(':' + element.attributes[i].name);
-            readerAttributeTerms.push(', ');
-          } else {
-            accesorAttributeTerms.push(':' + element.attributes[i].name);
-            accesorAttributeTerms.push(', ');
-          }
-        }
-      }
-
-      if (accesorAttributeTerms.length > 1) {
-        accesorAttributeTerms.pop();
-        codeWriter.writeLine('attr_accessor ' + accesorAttributeTerms.join(''));
-      }
-
-      if (readerAttributeTerms.length > 1) {
-        readerAttributeTerms.pop();
-        codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
-      }
-    } else if (type === 'short' && visibility === 'private') {
-      for (var i = 0; i < len; i++) {
-        attributeVisibility = this.getVisibility(element.attributes[i]);
-
-        if (attributeVisibility === 'private' && !element.attributes[i].isStatic) {
-          this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
-          if (element.attributes[i].isReadOnly) {
-            readerAttributeTerms.push(':' + element.attributes[i].name);
-            readerAttributeTerms.push(', ');
-          } else {
-            accesorAttributeTerms.push(':' + element.attributes[i].name);
-            accesorAttributeTerms.push(', ');
-          }
-        }
-      }
-
-      if (accesorAttributeTerms.length > 1) {
-        accesorAttributeTerms.pop();
-        codeWriter.writeLine('attr_accessor ' + accesorAttributeTerms.join(''));
-      }
-
-      if (readerAttributeTerms.length > 1) {
-        readerAttributeTerms.pop();
-        codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
-      }
+    if (type === 'short') {
+      this.writeShortAttributeAccessor(visibility, codeWriter, element, options);
     } else if (type === 'long' && visibility === 'public') {
       for (var i = 0; i < len; i++) {
         attributeVisibility = this.getVisibility(element.attributes[i]);
@@ -318,6 +245,39 @@ define(function (require, exports, module) {
         }
       }
     }
+  };
+
+  RubyCodeGenerator.prototype.writeShortAttributeAccessor = function (visibility, codeWriter, element, options) {
+    var readerAttributeTerms = [];
+    var accessorAttributeTerms = [];
+    var len = element.attributes.length;
+    var attributeVisibility;
+
+    for (var i = 0; i < len; i++) {
+        attributeVisibility = this.getVisibility(element.attributes[i]);
+
+        if (attributeVisibility === visibility && !element.attributes[i].isStatic) {
+          this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
+
+          if (element.attributes[i].isReadOnly) {
+            readerAttributeTerms.push(':' + element.attributes[i].name);
+            readerAttributeTerms.push(', ');
+          } else {
+            accessorAttributeTerms.push(':' + element.attributes[i].name);
+            accessorAttributeTerms.push(', ');
+          }
+        }
+      }
+
+      if (accessorAttributeTerms.length > 1) {
+        accessorAttributeTerms.pop();
+        codeWriter.writeLine('attr_accessor ' + accessorAttributeTerms.join(''));
+      }
+
+      if (readerAttributeTerms.length > 1) {
+        readerAttributeTerms.pop();
+        codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
+      }
   };
 
   RubyCodeGenerator.prototype.writeSetterGetterMethod = function (codeWriter, attribute) {
