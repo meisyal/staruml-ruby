@@ -186,64 +186,10 @@ define(function (require, exports, module) {
   };
 
   RubyCodeGenerator.prototype.writeAttributeAccessor = function (type, visibility, codeWriter, element, options) {
-    var accesorAttributeTerms = [];
-    var readerAttributeTerms = [];
-    var len = element.attributes.length;
-    var attributeVisibility;
-    var publicAttributeLastIndex;
-    var protectedAttributeLastIndex;
-    var privateAttributeLastIndex;
-
-    for (var i = 0; i < len; i++) {
-      attributeVisibility = this.getVisibility(element.attributes[i]);
-
-      if (attributeVisibility === 'public') {
-        publicAttributeLastIndex = i;
-      } else if (attributeVisibility === 'protected') {
-        protectedAttributeLastIndex = i;
-      } else if (attributeVisibility === 'private') {
-        privateAttributeLastIndex = i;
-      }
-    }
-
     if (type === 'short') {
       this.writeShortAttributeAccessor(visibility, codeWriter, element, options);
-    } else if (type === 'long' && visibility === 'public') {
-      for (var i = 0; i < len; i++) {
-        attributeVisibility = this.getVisibility(element.attributes[i]);
-
-        if (attributeVisibility === 'public' && !element.attributes[i].isStatic) {
-          this.writeSetterGetterMethod(codeWriter, element.attributes[i]);
-
-          if (i !== publicAttributeLastIndex) {
-            codeWriter.writeLine();
-          }
-        }
-      }
-    } else if (type === 'long' && visibility === 'protected') {
-      for (var i = 0; i < len; i++) {
-        attributeVisibility = this.getVisibility(element.attributes[i]);
-
-        if (attributeVisibility === 'protected') {
-          this.writeSetterGetterMethod(codeWriter, element.attributes[i]);
-
-          if (i !== protectedAttributeLastIndex) {
-            codeWriter.writeLine();
-          }
-        }
-      }
-    } else if (type === 'long' && visibility === 'private') {
-      for (var i = 0; i < len; i++) {
-        attributeVisibility = this.getVisibility(element.attributes[i]);
-
-        if (attributeVisibility === 'private' && !element.attributes[i].isStatic) {
-          this.writeSetterGetterMethod(codeWriter, element.attributes[i]);
-
-          if (i !== privateAttributeLastIndex) {
-            codeWriter.writeLine();
-          }
-        }
-      }
+    } else if (type === 'long') {
+      this.writeLongAttributeAccessor(visibility, codeWriter, element);
     }
   };
 
@@ -278,6 +224,32 @@ define(function (require, exports, module) {
         readerAttributeTerms.pop();
         codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
       }
+  };
+
+  RubyCodeGenerator.prototype.writeLongAttributeAccessor = function (visibility, codeWriter, element) {
+    var len = element.attributes.length;
+    var attributeVisibility;
+    var attributeLastIndex;
+
+    for (var i = 0; i < len; i++) {
+      attributeVisibility = this.getVisibility(element.attributes[i]);
+
+      if (attributeVisibility === visibility) {
+        attributeLastIndex = i;
+      }
+    }
+
+    for (var i = 0; i < len; i++) {
+      attributeVisibility = this.getVisibility(element.attributes[i]);
+
+      if (attributeVisibility === visibility && !element.attributes[i].isStatic) {
+        this.writeSetterGetterMethod(codeWriter, element.attributes[i]);
+
+        if (i !== attributeLastIndex) {
+          codeWriter.writeLine();
+        }
+      }
+    }
   };
 
   RubyCodeGenerator.prototype.writeSetterGetterMethod = function (codeWriter, attribute) {
