@@ -200,30 +200,30 @@ define(function (require, exports, module) {
     var attributeVisibility;
 
     for (var i = 0; i < len; i++) {
-        attributeVisibility = this.getVisibility(element.attributes[i]);
+      attributeVisibility = this.getVisibility(element.attributes[i]);
 
-        if (attributeVisibility === visibility && !element.attributes[i].isStatic) {
-          this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
+      if (attributeVisibility === visibility && !element.attributes[i].isStatic) {
+        this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
 
-          if (element.attributes[i].isReadOnly) {
-            readerAttributeTerms.push(':' + element.attributes[i].name);
-            readerAttributeTerms.push(', ');
-          } else {
-            accessorAttributeTerms.push(':' + element.attributes[i].name);
-            accessorAttributeTerms.push(', ');
-          }
+        if (element.attributes[i].isReadOnly) {
+          readerAttributeTerms.push(':' + element.attributes[i].name);
+          readerAttributeTerms.push(', ');
+        } else {
+          accessorAttributeTerms.push(':' + element.attributes[i].name);
+          accessorAttributeTerms.push(', ');
         }
       }
+    }
 
-      if (accessorAttributeTerms.length > 1) {
-        accessorAttributeTerms.pop();
-        codeWriter.writeLine('attr_accessor ' + accessorAttributeTerms.join(''));
-      }
+    if (accessorAttributeTerms.length > 1) {
+      accessorAttributeTerms.pop();
+      codeWriter.writeLine('attr_accessor ' + accessorAttributeTerms.join(''));
+    }
 
-      if (readerAttributeTerms.length > 1) {
-        readerAttributeTerms.pop();
-        codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
-      }
+    if (readerAttributeTerms.length > 1) {
+      readerAttributeTerms.pop();
+      codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
+    }
   };
 
   RubyCodeGenerator.prototype.writeLongAttributeAccessor = function (visibility, codeWriter, element) {
