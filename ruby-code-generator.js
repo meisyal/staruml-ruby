@@ -450,6 +450,28 @@ define(function (require, exports, module) {
     return methodCount;
   };
 
+  RubyCodeGenerator.prototype.getClassAssociation = function (element) {
+    var classAssociations = [];
+
+    var associations = Repository.getRelationshipsOf(element, function (relationship) {
+      return (relationship instanceof type.UMLAssociation);
+    });
+
+    for (var i = 0; i < associations.length; i++) {
+      var association = associations[i];
+
+      if (association.end1.reference === element && association.end2.navigable === true) {
+        classAssociations.push(codeWriter.fileName(association.end2.reference.name));
+      }
+
+      if (association.end2.reference === element && association.end1.navigable === true) {
+        classAssociations.push(codeWriter.fileName(association.end1.reference.name));
+      }
+    }
+
+    return classAssociations;
+  };
+
   RubyCodeGenerator.prototype.writeToStringMethod = function (codeWriter) {
     codeWriter.indent();
     codeWriter.writeLine('def to_s');
