@@ -450,7 +450,7 @@ define(function (require, exports, module) {
     return methodCount;
   };
 
-  RubyCodeGenerator.prototype.getClassAssociation = function (element) {
+  RubyCodeGenerator.prototype.getClassAssociation = function (codeWriter, element) {
     var classAssociations = [];
 
     var associations = Repository.getRelationshipsOf(element, function (relationship) {
@@ -498,6 +498,22 @@ define(function (require, exports, module) {
 
     codeWriter.writeLine(terms.join(' '));
     codeWriter.indent();
+
+    var associations = this.getClassAssociation(codeWriter, element);
+    var associationTerms = [];
+    if (associations.length) {
+      for (var i = 0; i < associations.length; i++) {
+        associationTerms.push(':' + associations[i]);
+        associationTerms.push(', ');
+      }
+
+      if (associationTerms.length > 1) {
+        associationTerms.pop();
+        codeWriter.writeLine('attr_accessor ' + associationTerms.join(''));
+      }
+
+      codeWriter.writeLine();
+    }
 
     var attributeCount = this.countAttributeByVisibility(element);
     var publicAttributeLength = attributeCount[0];
