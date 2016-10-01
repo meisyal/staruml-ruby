@@ -180,6 +180,14 @@ define(function (require, exports, module) {
         }
       }
 
+      var associations = this.getClassAssociation(codeWriter, element);
+      if (associations.length) {
+        for (var k = 0; k < associations.length; k++) {
+          codeWriter.writeLine('@' + associations[k] + ' = ' + associations[k] +
+            '.new');
+        }
+      }
+
       codeWriter.outdent();
       codeWriter.writeLine('end');
     }
