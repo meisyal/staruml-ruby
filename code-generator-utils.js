@@ -31,5 +31,11 @@ define(function (require, exports, module) {
     return className.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
   };
 
+  CodeWriter.prototype.toCamelCase = function (className) {
+    return className.replace(/(\b|_)\w/g, function (match) {
+      return match.replace(/_/, '').toUpperCase();
+    });
+  };
+
   exports.CodeWriter = CodeWriter;
 });
