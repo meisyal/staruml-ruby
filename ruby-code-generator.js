@@ -176,15 +176,15 @@ define(function (require, exports, module) {
       for (var j = 0; j < len; j++) {
         if (!element.attributes[j].isStatic) {
           codeWriter.writeLine('@' + element.attributes[j].name + ' = ' +
-            element.attributes[j].name);
+              element.attributes[j].name);
         }
       }
 
       var associations = this.getClassAssociation(codeWriter, element);
       if (associations.length) {
         for (var k = 0; k < associations.length; k++) {
-          codeWriter.writeLine('@' + associations[k] + ' = ' + associations[k] +
-            '.new');
+          codeWriter.writeLine('@' + associations[k] + ' = ' +
+              codeWriter.toCamelCase(associations[k]) + '.new');
         }
       }
 
