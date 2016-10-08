@@ -3,52 +3,6 @@
 staruml-ruby is a Ruby extension for [StarUML][staruml] 2. This extension helps you
 to generate Ruby code from a UML class diagram.
 
-## Installation
-
-There are several ways to install this extension. You can install manually, via
-StarUML extension repository, or via URL. **I strongly recommend installing via
-StarUML extension repository**.
-
-### Manual
-
-If you prefer to install manually. Please, follow these steps below.
-
-1. Download the latest package of staruml-ruby [here][release].
-2. Create a new folder `meisyal.starumlruby` in this location. Location depends on
-   your operating system.
-
-   * Linux: `~/.config/StarUML/extensions/user`
-   * Mac OS: `~/Library/Application Support/StarUML/extensions/user`
-   * Windows: `C:\Users\<user>\AppData\Roaming\StarUML\extensions\user`
-
-3. Extract the package in the new extension folder.
-4. Open or restart StarUML if you have already opened it.
-
-Internet connection is needed before installing extension via StarUML extension
-repository or URL.
-
-### via StarUML extension repository
-
-Open the StarUML extension manager (**Tools** -> **Extension Manager...**) and
-install the Ruby extension. I recommend this installation method because it is
-going to install the stable version of the extension. Beside that, the installed
-extension is from StarUML extension repository (it means the extension is officially
-registered).
-
-### via URL
-
-Follow these steps below.
-
-1. Open the StarUML extension manager (**Tools** -> **Extension Manager...**).
-2. Select **Install From URL...** button in the bottom left corner of the pop
-   window.
-3. Enter the following URL `https://github.com/meisyal/staruml-ruby`.
-4. Open or restart StarUML if you are already opening it.
-
-At last, open the StarUML extension manager (**Tools** -> **Extension Manager...**)
-and then click **Installed** tab to make sure this extension is successfully
-installed.
-
 ## Current Status
 
 This extension currently supports generating Ruby code from a UML class diagram.
@@ -103,6 +57,24 @@ tool will generate method parameters.
 * tool will generate constants.
 * the constants support public and private constants.
 
+## Installation
+
+The simplest way to install staruml-ruby is from StarUML extension repository.
+This installation method is explained as follows:
+
+1. Open StarUML.
+2. Click **Tools** -> **Extension Manager...**. The Extension Manager window
+   will appear as a pop window.
+3. Install the Ruby extension by clicking **Install** button.
+
+Note that internet connection is needed to perfom the installation.
+
+StarUML extension repository stores extensions that officially registered.
+Because of it, I **highly recommend** to use this method. Registered
+extensions are available on [this page][starumlextension].
+
+See [Installation][installation] for other installation methods.
+
 ## How to use this extension
 
 Please, follow these steps below.
@@ -140,7 +112,8 @@ file for more details.
 Copyright &copy; 2016 Andrias Meisyal.
 
 [staruml]: http://staruml.io
-[release]: https://github.com/meisyal/staruml-ruby/releases
+[starumlextension]: http://staruml.io/extensions
+[installation]: https://github.com/meisyal/staruml-ruby/wiki/Installation
 [wiki]: https://github.com/meisyal/staruml-ruby/wiki
 [contributing]:
 https://github.com/meisyal/staruml-ruby/blob/master/CONTRIBUTING.md
