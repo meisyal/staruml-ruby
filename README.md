@@ -65,7 +65,9 @@ This installation method is explained as follows:
 1. Open StarUML.
 2. Click **Tools** -> **Extension Manager...**. The Extension Manager window
    will appear as a pop window.
-3. Install the Ruby extension by clicking **Install** button.
+3. Select **Registry** button.
+4. Type `ruby` on search box. Ruby extension will appear.
+5. Press **Install** button of Ruby extension.
 
 Note that internet connection is needed to perfom the installation.
 
@@ -101,8 +103,8 @@ contains a lot more detail on examples, use and features, and roadmap.
 
 ## Contributing
 
-Before submitting an issue or a pull request, please take a moment to look over
-the [contributing guidelines][contributing] first.
+Contributions are welcome. Before submitting an issue or a pull request, please
+take a moment to look over the [contributing guidelines][contributing] first.
 
 ## License
 
