@@ -16,12 +16,11 @@ Please, refer to [Supported UML concepts][umlconcept] page for futher details.
 The simplest way to install staruml-ruby is from StarUML extension repository.
 This installation method is explained as follows:
 
-1. Open StarUML.
-2. Click **Tools** -> **Extension Manager...**. The Extension Manager window
-   will appear as a pop window.
-3. Select **Registry** button.
-4. Type `ruby` on search box. Ruby extension will appear.
-5. Press **Install** button of Ruby extension.
+1. Click **Tools** -> **Extension Manager...** on the menu bar of StarUML.
+   The Extension Manager window will appear as a pop-up window.
+2. Select **Registry** button.
+3. Type `ruby` on search box. Ruby extension will appear.
+4. Press **Install** button of Ruby extension.
 
 Note that internet connection is needed to perfom the installation.
 
@@ -31,15 +30,17 @@ extensions are available on [this page][starumlextension].
 
 See [Installation][installation] for other installation methods.
 
-## How to use this extension
+## Usage
 
-Please, follow these steps below.
+When this extension is successfully installed, it's time to use the extension.
+Prepare your model that contains a UML class diagram and then:
 
-1. Click the menu (**Tools** -> **Ruby** -> **Generate Code...**).
-2. Select a model which will be generated its code in the pop window. And then,
-   click **OK**.
-3. Select a location where the generated code will be saved.
-4. The generated code will be saved in the place where you selected before.
+1. Click **Tools** -> **Ruby** -> **Generate Code...** on the menu bar of
+   StarUML. A pop-up window will appear.
+2. Choose a model that will be generated its code. And then, press **OK**
+   button.
+3. Select a location where the generated code will be stored.
+4. Press **Open** button.
 
 ## How to configure this extension
 
