@@ -42,19 +42,20 @@ Prepare your model that contains a UML class diagram and then:
 3. Select a location where the generated code will be stored.
 4. Press **Open** button.
 
-## How to configure this extension
+Your Ruby code is generated. :yay:
 
-You can configure the extension before generating the code.
+## Configuration
 
-1. Click the menu (**Tools** -> **Ruby** -> **Configure...**).
-2. Manage the configuration for code generation (there are some options there). You
-   can always restore default configurations.
-3. Click **Close** when you have configured it.
+You can configure the extension before generating the code. The configuration
+handles indentation of code, code comment, and etc. This is supported by the
+extension to generate the code, as you prefer.
+
+Check [Configuration][configuration] to configure the extension.
 
 ## Documentation
 
 Documentation is available at [staruml-ruby GitHub Wiki][wiki]. Documentation
-contains a lot more detail on examples, use and features, and roadmap.
+contains a lot more detail on examples, features, and roadmap.
 
 ## Contributing
 
@@ -63,8 +64,8 @@ take a moment to look over the [contributing guidelines][contributing] first.
 
 ## License
 
-This extension is released under the terms of MIT License. See the [LICENSE][license]
-file for more details.
+This extension is released under the terms of MIT License. See the
+[LICENSE][license] file for more details.
 
 Copyright &copy; 2016 Andrias Meisyal.
 
@@ -73,6 +74,7 @@ Copyright &copy; 2016 Andrias Meisyal.
 https://github.com/meisyal/staruml-ruby/wiki/Supported-UML-Concepts
 [starumlextension]: http://staruml.io/extensions
 [installation]: https://github.com/meisyal/staruml-ruby/wiki/Installation
+[configuration]: https://github.com/meisyal/staruml-ruby/wiki/Configuration
 [wiki]: https://github.com/meisyal/staruml-ruby/wiki
 [contributing]:
 https://github.com/meisyal/staruml-ruby/blob/master/CONTRIBUTING.md
