@@ -1,7 +1,7 @@
 # staruml-ruby
 
-staruml-ruby is a Ruby extension for [StarUML][staruml] 2. This extension helps you
-to generate Ruby code from a UML class diagram.
+staruml-ruby is a Ruby extension for [StarUML][staruml] 2. This extension helps
+you to generate Ruby code from a UML class diagram.
 
 ## Current Status
 
@@ -25,8 +25,8 @@ This installation method is explained as follows:
 Note that internet connection is needed to perfom the installation.
 
 StarUML extension repository stores extensions that officially registered.
-Because of it, I **highly recommend** to use this method. Registered
-extensions are available on [this page][starumlextension].
+Because of it, I **highly recommend** to use this installation method.
+Registered extensions are available on [this page][starumlextension].
 
 See [Installation][installation] for other installation methods.
 
@@ -47,8 +47,9 @@ Your Ruby code is generated. :yay:
 ## Configuration
 
 You can configure the extension before generating the code. The configuration
-handles indentation of code, code comment, and etc. This is supported by the
-extension to generate the code, as you prefer.
+handles how the generated code looks like. Indentation of code and code comment,
+for example. This is supported by this extension to generate Ruby code, as
+you prefer.
 
 Check [Configuration][configuration] to configure the extension.
 
