@@ -112,6 +112,32 @@ define(function (require, exports, module) {
     });
   };
 
+  RubyCodeGenerator.prototype.writeAssociation = function (codeWriter, element) {
+    var associations = Repository.getRelationshipsOf(element, function (relationship) {
+      return (relationship instanceof type.UMLAssociation);
+    });
+
+    for (var i = 0; i < associations.length; i++) {
+      var association = associations[i];
+
+      if (association.end1.reference === element && association.end2.navigable === true) {
+        var fileName = codeWriter.fileName(association.end2.reference.name);
+
+        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+      }
+
+      if (association.end2.reference === element && association.end1.navigable === true) {
+        var fileName = codeWriter.fileName(association.end1.reference.name);
+
+        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+      }
+    }
+
+    if (associations.length) {
+      codeWriter.writeLine();
+    }
+  };
+
   RubyCodeGenerator.prototype.writeDocumentation = function (codeWriter, text, options) {
     var lines;
 
@@ -150,7 +176,15 @@ define(function (require, exports, module) {
       for (var j = 0; j < len; j++) {
         if (!element.attributes[j].isStatic) {
           codeWriter.writeLine('@' + element.attributes[j].name + ' = ' +
-            element.attributes[j].name);
+              element.attributes[j].name);
+        }
+      }
+
+      var associations = this.getClassAssociation(codeWriter, element);
+      if (associations.length) {
+        for (var k = 0; k < associations.length; k++) {
+          codeWriter.writeLine('@' + associations[k] + ' = ' +
+              codeWriter.toCamelCase(associations[k]) + '.new');
         }
       }
 
@@ -160,135 +194,67 @@ define(function (require, exports, module) {
   };
 
   RubyCodeGenerator.prototype.writeAttributeAccessor = function (type, visibility, codeWriter, element, options) {
-    var accesorAttributeTerms = [];
+    if (type === 'short') {
+      this.writeShortAttributeAccessor(visibility, codeWriter, element, options);
+    } else if (type === 'long') {
+      this.writeLongAttributeAccessor(visibility, codeWriter, element);
+    }
+  };
+
+  RubyCodeGenerator.prototype.writeShortAttributeAccessor = function (visibility, codeWriter, element, options) {
     var readerAttributeTerms = [];
+    var accessorAttributeTerms = [];
     var len = element.attributes.length;
     var attributeVisibility;
-    var publicAttributeLastIndex;
-    var protectedAttributeLastIndex;
-    var privateAttributeLastIndex;
 
     for (var i = 0; i < len; i++) {
       attributeVisibility = this.getVisibility(element.attributes[i]);
 
-      if (attributeVisibility === 'public') {
-        publicAttributeLastIndex = i;
-      } else if (attributeVisibility === 'protected') {
-        protectedAttributeLastIndex = i;
-      } else if (attributeVisibility === 'private') {
-        privateAttributeLastIndex = i;
+      if (attributeVisibility === visibility && !element.attributes[i].isStatic) {
+        this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
+
+        if (element.attributes[i].isReadOnly) {
+          readerAttributeTerms.push(':' + element.attributes[i].name);
+          readerAttributeTerms.push(', ');
+        } else {
+          accessorAttributeTerms.push(':' + element.attributes[i].name);
+          accessorAttributeTerms.push(', ');
+        }
       }
     }
 
-    if (type === 'short' && visibility === 'public') {
-      for (var i = 0; i < len; i++) {
-        attributeVisibility = this.getVisibility(element.attributes[i]);
+    if (accessorAttributeTerms.length > 1) {
+      accessorAttributeTerms.pop();
+      codeWriter.writeLine('attr_accessor ' + accessorAttributeTerms.join(''));
+    }
 
-        if (attributeVisibility === 'public' && !element.attributes[i].isStatic) {
-          this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
-          if (element.attributes[i].isReadOnly) {
-            readerAttributeTerms.push(':' + element.attributes[i].name);
-            readerAttributeTerms.push(', ');
-          } else {
-            accesorAttributeTerms.push(':' + element.attributes[i].name);
-            accesorAttributeTerms.push(', ');
-          }
-        }
+    if (readerAttributeTerms.length > 1) {
+      readerAttributeTerms.pop();
+      codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
+    }
+  };
+
+  RubyCodeGenerator.prototype.writeLongAttributeAccessor = function (visibility, codeWriter, element) {
+    var len = element.attributes.length;
+    var attributeVisibility;
+    var attributeLastIndex;
+
+    for (var i = 0; i < len; i++) {
+      attributeVisibility = this.getVisibility(element.attributes[i]);
+
+      if (attributeVisibility === visibility) {
+        attributeLastIndex = i;
       }
+    }
 
-      if (accesorAttributeTerms.length > 1) {
-        accesorAttributeTerms.pop();
-        codeWriter.writeLine('attr_accessor ' + accesorAttributeTerms.join(''));
-      }
+    for (var i = 0; i < len; i++) {
+      attributeVisibility = this.getVisibility(element.attributes[i]);
 
-      if (readerAttributeTerms.length > 1) {
-        readerAttributeTerms.pop();
-        codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
-      }
-    } else if (type === 'short' && visibility === 'protected') {
-      for (var i = 0; i < len; i++) {
-        attributeVisibility = this.getVisibility(element.attributes[i]);
+      if (attributeVisibility === visibility && !element.attributes[i].isStatic) {
+        this.writeSetterGetterMethod(codeWriter, element.attributes[i]);
 
-        if (attributeVisibility === 'protected') {
-          this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
-          if (element.attributes[i].isReadOnly) {
-            readerAttributeTerms.push(':' + element.attributes[i].name);
-            readerAttributeTerms.push(', ');
-          } else {
-            accesorAttributeTerms.push(':' + element.attributes[i].name);
-            accesorAttributeTerms.push(', ');
-          }
-        }
-      }
-
-      if (accesorAttributeTerms.length > 1) {
-        accesorAttributeTerms.pop();
-        codeWriter.writeLine('attr_accessor ' + accesorAttributeTerms.join(''));
-      }
-
-      if (readerAttributeTerms.length > 1) {
-        readerAttributeTerms.pop();
-        codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
-      }
-    } else if (type === 'short' && visibility === 'private') {
-      for (var i = 0; i < len; i++) {
-        attributeVisibility = this.getVisibility(element.attributes[i]);
-
-        if (attributeVisibility === 'private' && !element.attributes[i].isStatic) {
-          this.writeDocumentation(codeWriter, element.attributes[i].documentation, options);
-          if (element.attributes[i].isReadOnly) {
-            readerAttributeTerms.push(':' + element.attributes[i].name);
-            readerAttributeTerms.push(', ');
-          } else {
-            accesorAttributeTerms.push(':' + element.attributes[i].name);
-            accesorAttributeTerms.push(', ');
-          }
-        }
-      }
-
-      if (accesorAttributeTerms.length > 1) {
-        accesorAttributeTerms.pop();
-        codeWriter.writeLine('attr_accessor ' + accesorAttributeTerms.join(''));
-      }
-
-      if (readerAttributeTerms.length > 1) {
-        readerAttributeTerms.pop();
-        codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
-      }
-    } else if (type === 'long' && visibility === 'public') {
-      for (var i = 0; i < len; i++) {
-        attributeVisibility = this.getVisibility(element.attributes[i]);
-
-        if (attributeVisibility === 'public' && !element.attributes[i].isStatic) {
-          this.writeSetterGetterMethod(codeWriter, element.attributes[i]);
-
-          if (i !== publicAttributeLastIndex) {
-            codeWriter.writeLine();
-          }
-        }
-      }
-    } else if (type === 'long' && visibility === 'protected') {
-      for (var i = 0; i < len; i++) {
-        attributeVisibility = this.getVisibility(element.attributes[i]);
-
-        if (attributeVisibility === 'protected') {
-          this.writeSetterGetterMethod(codeWriter, element.attributes[i]);
-
-          if (i !== protectedAttributeLastIndex) {
-            codeWriter.writeLine();
-          }
-        }
-      }
-    } else if (type === 'long' && visibility === 'private') {
-      for (var i = 0; i < len; i++) {
-        attributeVisibility = this.getVisibility(element.attributes[i]);
-
-        if (attributeVisibility === 'private' && !element.attributes[i].isStatic) {
-          this.writeSetterGetterMethod(codeWriter, element.attributes[i]);
-
-          if (i !== privateAttributeLastIndex) {
-            codeWriter.writeLine();
-          }
+        if (i !== attributeLastIndex) {
+          codeWriter.writeLine();
         }
       }
     }
@@ -492,6 +458,28 @@ define(function (require, exports, module) {
     return methodCount;
   };
 
+  RubyCodeGenerator.prototype.getClassAssociation = function (codeWriter, element) {
+    var classAssociations = [];
+
+    var associations = Repository.getRelationshipsOf(element, function (relationship) {
+      return (relationship instanceof type.UMLAssociation);
+    });
+
+    for (var i = 0; i < associations.length; i++) {
+      var association = associations[i];
+
+      if (association.end1.reference === element && association.end2.navigable === true) {
+        classAssociations.push(codeWriter.fileName(association.end2.reference.name));
+      }
+
+      if (association.end2.reference === element && association.end1.navigable === true) {
+        classAssociations.push(codeWriter.fileName(association.end1.reference.name));
+      }
+    }
+
+    return classAssociations;
+  };
+
   RubyCodeGenerator.prototype.writeToStringMethod = function (codeWriter) {
     codeWriter.indent();
     codeWriter.writeLine('def to_s');
@@ -505,6 +493,8 @@ define(function (require, exports, module) {
     var terms = [];
     var staticAttributeCount = this.countStaticAttribute(element);
 
+    this.writeAssociation(codeWriter, element);
+
     this.writeDocumentation(codeWriter, element.documentation, options);
     terms.push('class');
     terms.push(element.name);
@@ -516,6 +506,22 @@ define(function (require, exports, module) {
 
     codeWriter.writeLine(terms.join(' '));
     codeWriter.indent();
+
+    var associations = this.getClassAssociation(codeWriter, element);
+    var associationTerms = [];
+    if (associations.length) {
+      for (var i = 0; i < associations.length; i++) {
+        associationTerms.push(':' + associations[i]);
+        associationTerms.push(', ');
+      }
+
+      if (associationTerms.length > 1) {
+        associationTerms.pop();
+        codeWriter.writeLine('attr_accessor ' + associationTerms.join(''));
+      }
+
+      codeWriter.writeLine();
+    }
 
     var attributeCount = this.countAttributeByVisibility(element);
     var publicAttributeLength = attributeCount[0];
