@@ -30,12 +30,6 @@ define(function (require, exports, module) {
       type: 'Check',
       default: true,
     },
-    'ruby.gen.useAttributeAccessor': {
-      text: 'Attribute accessor',
-      description: 'Use shortcut for attribute accessors (writer and reader).',
-      type: 'Check',
-      default: false,
-    },
     'ruby.gen.toStringMethod': {
       text: 'The to_s method',
       description: 'Generate to_s method that returns a string representation of the object.',
@@ -59,7 +53,6 @@ define(function (require, exports, module) {
       useTab: PreferenceManager.get('ruby.gen.useTab'),
       indentSpaces: PreferenceManager.get('ruby.gen.indentSpaces'),
       initializeMethod: PreferenceManager.get('ruby.gen.initializeMethod'),
-      useAttributeAccessor: PreferenceManager.get('ruby.gen.useAttributeAccessor'),
       rubyToStringMethod: PreferenceManager.get('ruby.gen.toStringMethod'),
       documentation: PreferenceManager.get('ruby.gen.documentation'),
     };
