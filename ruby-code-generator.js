@@ -194,11 +194,7 @@ define(function (require, exports, module) {
   };
 
   RubyCodeGenerator.prototype.writeAttributeAccessor = function (type, visibility, codeWriter, element, options) {
-    if (type === 'short') {
       this.writeShortAttributeAccessor(visibility, codeWriter, element, options);
-    } else if (type === 'long') {
-      this.writeLongAttributeAccessor(visibility, codeWriter, element);
-    }
   };
 
   RubyCodeGenerator.prototype.writeShortAttributeAccessor = function (visibility, codeWriter, element, options) {
@@ -231,49 +227,6 @@ define(function (require, exports, module) {
     if (readerAttributeTerms.length > 1) {
       readerAttributeTerms.pop();
       codeWriter.writeLine('attr_reader ' + readerAttributeTerms.join(''));
-    }
-  };
-
-  RubyCodeGenerator.prototype.writeLongAttributeAccessor = function (visibility, codeWriter, element) {
-    var len = element.attributes.length;
-    var attributeVisibility;
-    var attributeLastIndex;
-
-    for (var i = 0; i < len; i++) {
-      attributeVisibility = this.getVisibility(element.attributes[i]);
-
-      if (attributeVisibility === visibility) {
-        attributeLastIndex = i;
-      }
-    }
-
-    for (var i = 0; i < len; i++) {
-      attributeVisibility = this.getVisibility(element.attributes[i]);
-
-      if (attributeVisibility === visibility && !element.attributes[i].isStatic) {
-        this.writeSetterGetterMethod(codeWriter, element.attributes[i]);
-
-        if (i !== attributeLastIndex) {
-          codeWriter.writeLine();
-        }
-      }
-    }
-  };
-
-  RubyCodeGenerator.prototype.writeSetterGetterMethod = function (codeWriter, attribute) {
-    codeWriter.writeLine('def ' + attribute.name);
-    codeWriter.indent();
-    codeWriter.writeLine('@' + attribute.name);
-    codeWriter.outdent();
-    codeWriter.writeLine('end');
-
-    if (!attribute.isReadOnly) {
-      codeWriter.writeLine();
-      codeWriter.writeLine('def ' + attribute.name + '=(value)');
-      codeWriter.indent();
-      codeWriter.writeLine('@' + attribute.name + ' = value');
-      codeWriter.outdent();
-      codeWriter.writeLine('end');
     }
   };
 
@@ -347,13 +300,8 @@ define(function (require, exports, module) {
       codeWriter.writeLine('protected');
       codeWriter.indent();
       if (protectedAttributeLength) {
-        if (options.useAttributeAccessor) {
-          this.writeAttributeAccessor('short', 'protected', codeWriter, element, options);
-          codeWriter.writeLine();
-        } else if (!options.useAttributeAccessor) {
-          this.writeAttributeAccessor('long', 'protected', codeWriter, element, options);
-          codeWriter.writeLine();
-        }
+        this.writeAttributeAccessor('short', 'protected', codeWriter, element, options);
+        codeWriter.writeLine();
       }
 
       codeWriter.outdent();
@@ -371,13 +319,8 @@ define(function (require, exports, module) {
       codeWriter.writeLine('private');
       codeWriter.indent();
       if (privateAttributeLength) {
-        if (options.useAttributeAccessor) {
-          this.writeAttributeAccessor('short', 'private', codeWriter, element, options);
-          codeWriter.writeLine();
-        } else if (!options.useAttributeAccessor) {
-          this.writeAttributeAccessor('long', 'private', codeWriter, element, options);
-          codeWriter.writeLine();
-        }
+        this.writeAttributeAccessor('short', 'private', codeWriter, element, options);
+        codeWriter.writeLine();
       }
 
       codeWriter.outdent();
@@ -525,7 +468,7 @@ define(function (require, exports, module) {
 
     var attributeCount = this.countAttributeByVisibility(element);
     var publicAttributeLength = attributeCount[0];
-    if (options.useAttributeAccessor && publicAttributeLength) {
+    if (publicAttributeLength) {
       this.writeAttributeAccessor('short', 'public', codeWriter, element, options);
       if (!staticAttributeCount) {
         codeWriter.writeLine();
@@ -539,11 +482,6 @@ define(function (require, exports, module) {
 
     if (options.initializeMethod) {
       this.writeConstructor(codeWriter, element);
-      codeWriter.writeLine();
-    }
-
-    if (!options.useAttributeAccessor && publicAttributeLength) {
-      this.writeAttributeAccessor('long', 'public', codeWriter, element, options);
       codeWriter.writeLine();
     }
 
