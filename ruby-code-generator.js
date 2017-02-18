@@ -193,11 +193,7 @@ define(function (require, exports, module) {
     }
   };
 
-  RubyCodeGenerator.prototype.writeAttributeAccessor = function (type, visibility, codeWriter, element, options) {
-      this.writeShortAttributeAccessor(visibility, codeWriter, element, options);
-  };
-
-  RubyCodeGenerator.prototype.writeShortAttributeAccessor = function (visibility, codeWriter, element, options) {
+  RubyCodeGenerator.prototype.writeAttributeAccessor = function (visibility, codeWriter, element, options) {
     var readerAttributeTerms = [];
     var accessorAttributeTerms = [];
     var len = element.attributes.length;
@@ -300,7 +296,7 @@ define(function (require, exports, module) {
       codeWriter.writeLine('protected');
       codeWriter.indent();
       if (protectedAttributeLength) {
-        this.writeAttributeAccessor('short', 'protected', codeWriter, element, options);
+        this.writeAttributeAccessor('protected', codeWriter, element, options);
         codeWriter.writeLine();
       }
 
@@ -319,7 +315,7 @@ define(function (require, exports, module) {
       codeWriter.writeLine('private');
       codeWriter.indent();
       if (privateAttributeLength) {
-        this.writeAttributeAccessor('short', 'private', codeWriter, element, options);
+        this.writeAttributeAccessor('private', codeWriter, element, options);
         codeWriter.writeLine();
       }
 
@@ -469,7 +465,7 @@ define(function (require, exports, module) {
     var attributeCount = this.countAttributeByVisibility(element);
     var publicAttributeLength = attributeCount[0];
     if (publicAttributeLength) {
-      this.writeAttributeAccessor('short', 'public', codeWriter, element, options);
+      this.writeAttributeAccessor('public', codeWriter, element, options);
       if (!staticAttributeCount) {
         codeWriter.writeLine();
       }
