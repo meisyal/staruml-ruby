@@ -173,18 +173,18 @@ define(function (require, exports, module) {
 
       codeWriter.writeLine(terms.join('') + ')');
       codeWriter.indent();
-      for (var j = 0; j < len; j++) {
-        if (!element.attributes[j].isStatic) {
-          codeWriter.writeLine('@' + element.attributes[j].name + ' = ' +
-              element.attributes[j].name);
+      for (var i = 0; i < len; i++) {
+        if (!element.attributes[i].isStatic) {
+          codeWriter.writeLine('@' + element.attributes[i].name + ' = ' +
+              element.attributes[i].name);
         }
       }
 
       var associations = this.getClassAssociation(codeWriter, element);
       if (associations.length) {
-        for (var k = 0; k < associations.length; k++) {
-          codeWriter.writeLine('@' + associations[k] + ' = ' +
-              codeWriter.toCamelCase(associations[k]) + '.new');
+        for (var i = 0; i < associations.length; i++) {
+          codeWriter.writeLine('@' + associations[i] + ' = ' +
+              codeWriter.toCamelCase(associations[i]) + '.new');
         }
       }
 
@@ -230,12 +230,23 @@ define(function (require, exports, module) {
     var len = element.attributes.length;
 
     for (var i = 0; i < len; i++) {
-      if (element.attributes[i].isStatic) {
+      if (element.attributes[i].isReadOnly && element.attributes[i].isStatic) {
         codeWriter.writeLine(element.attributes[i].name + ' = ' +
           element.attributes[i].defaultValue);
         if (this.getVisibility(element.attributes[i]) === 'private') {
           codeWriter.writeLine('private_constant :' + element.attributes[i].name);
         }
+      }
+    }
+  };
+
+  RubyCodeGenerator.prototype.writeClassVariable = function (codeWriter, element) {
+    var len = element.attributes.length;
+
+    for (var i = 0; i < len; i++) {
+      if (!element.attributes[i].isReadOnly && element.attributes[i].isStatic) {
+        codeWriter.writeLine('@@' + element.attributes[i].name + ' = ' +
+          element.attributes[i].defaultValue);
       }
     }
   };
@@ -473,6 +484,7 @@ define(function (require, exports, module) {
 
     if (staticAttributeCount) {
       this.writeConstant(codeWriter, element);
+      this.writeClassVariable(codeWriter, element);
       codeWriter.writeLine();
     }
 
