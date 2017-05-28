@@ -439,6 +439,9 @@ define(function (require, exports, module) {
     codeWriter.writeLine('end');
   };
 
+  RubyCodeGenerator.prototype.writeInterface = function (codeWriter, element) {
+  };
+
   RubyCodeGenerator.prototype.writeClass = function (codeWriter, element, options) {
     var terms = [];
     var staticAttributeCount = this.countStaticAttribute(element);
