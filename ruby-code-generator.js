@@ -70,6 +70,13 @@ define(function (require, exports, module) {
         file = FileSystem.getFileForPath(fullPath);
         FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
       }
+    } else if (element instanceof type.UMLInterface) {
+      codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
+      this.writeInterface(codeWriter, element)
+
+      fullPath = path + '/' + codeWriter.fileName(element.name) + '.rb';
+      file = FileSystem.getFileForPath(fullPath);
+      FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
     } else {
       result.resolve();
     }
@@ -440,6 +447,13 @@ define(function (require, exports, module) {
   };
 
   RubyCodeGenerator.prototype.writeInterface = function (codeWriter, element) {
+    var terms = [];
+
+    terms.push('module');
+    terms.push(element.name);
+
+    codeWriter.writeLine(terms.join(' '));
+    codeWriter.writeLine('end');
   };
 
   RubyCodeGenerator.prototype.writeClass = function (codeWriter, element, options) {
