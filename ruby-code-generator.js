@@ -72,7 +72,7 @@ define(function (require, exports, module) {
       }
     } else if (element instanceof type.UMLInterface) {
       codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
-      this.writeInterface(codeWriter, element)
+      this.writeInterface(codeWriter, element, options)
 
       fullPath = path + '/' + codeWriter.fileName(element.name) + '.rb';
       file = FileSystem.getFileForPath(fullPath);
@@ -446,13 +446,14 @@ define(function (require, exports, module) {
     codeWriter.writeLine('end');
   };
 
-  RubyCodeGenerator.prototype.writeInterface = function (codeWriter, element) {
+  RubyCodeGenerator.prototype.writeInterface = function (codeWriter, element, options) {
     var terms = [];
 
     terms.push('module');
     terms.push(element.name);
 
     codeWriter.writeLine(terms.join(' '));
+    this.writeMethodByVisibility(codeWriter, element, options);
     codeWriter.writeLine('end');
   };
 
