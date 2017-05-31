@@ -119,6 +119,9 @@ define(function (require, exports, module) {
     });
   };
 
+  RubyCodeGenerator.prototype.getInterface = function (element) {
+  };
+
   RubyCodeGenerator.prototype.writeAssociation = function (codeWriter, element) {
     var associations = Repository.getRelationshipsOf(element, function (relationship) {
       return (relationship instanceof type.UMLAssociation);
