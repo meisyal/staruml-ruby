@@ -120,6 +120,13 @@ define(function (require, exports, module) {
   };
 
   RubyCodeGenerator.prototype.getInterface = function (element) {
+    var interfaces = Repository.getRelationshipsOf(element, function (relationship) {
+      return (relationship instanceof type.UMLInterfaceRealization && relationship.source === element);
+    });
+
+    return _.map(interfaces, function (implement) {
+      return implement.target;
+    });
   };
 
   RubyCodeGenerator.prototype.writeAssociation = function (codeWriter, element) {
