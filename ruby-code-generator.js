@@ -485,6 +485,12 @@ define(function (require, exports, module) {
     codeWriter.writeLine(terms.join(' '));
     codeWriter.indent();
 
+    var _interface = this.getInterface(element);
+    if (_interface.length) {
+      codeWriter.writeLine('include ' + _interface[0].name);
+      codeWriter.writeLine();
+    }
+
     var associations = this.getClassAssociation(codeWriter, element);
     var associationTerms = [];
     if (associations.length) {
