@@ -473,6 +473,12 @@ define(function (require, exports, module) {
 
     this.writeAssociation(codeWriter, element);
 
+    var _interface = this.getInterface(element);
+    if (_interface.length) {
+      codeWriter.writeLine('require_relative \'./' + codeWriter.fileName(_interface[0].name) + '.rb\'');
+      codeWriter.writeLine();
+    }
+
     this.writeDocumentation(codeWriter, element.documentation, options);
     terms.push('class');
     terms.push(element.name);
@@ -485,7 +491,6 @@ define(function (require, exports, module) {
     codeWriter.writeLine(terms.join(' '));
     codeWriter.indent();
 
-    var _interface = this.getInterface(element);
     if (_interface.length) {
       codeWriter.writeLine('include ' + _interface[0].name);
       codeWriter.writeLine();
