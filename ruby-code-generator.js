@@ -53,7 +53,7 @@ define(function (require, exports, module) {
     } else if (element instanceof type.UMLClass) {
       if (element.stereotype !== 'annotationType') {
         codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
-        var moduleName = this.getPackageName(codeWriter, element);
+        var moduleName = this.getPackageName(element);
         if (moduleName) {
           this.writeDocumentation(codeWriter, element._parent.documentation, options);
           codeWriter.writeLine('module ' + moduleName);
@@ -97,7 +97,7 @@ define(function (require, exports, module) {
     return null;
   };
 
-  RubyCodeGenerator.prototype.getPackageName = function (codeWriter, element) {
+  RubyCodeGenerator.prototype.getPackageName = function (element) {
     var path = null;
 
     if (element._parent) {
