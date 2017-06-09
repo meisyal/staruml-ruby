@@ -475,7 +475,14 @@ define(function (require, exports, module) {
 
     var _interface = this.getInterface(element);
     if (_interface.length) {
-      codeWriter.writeLine('require_relative \'./' + codeWriter.fileName(_interface[0].name) + '.rb\'');
+      var packageName = this.getPackageName(_interface[0]);
+
+      if (packageName) {
+        codeWriter.writeLine('require_relative \'' + codeWriter.fileName(packageName) + '/' + codeWriter.fileName(_interface[0].name) + '.rb\'');
+      } else {
+        codeWriter.writeLine('require_relative \'' + codeWriter.fileName(_interface[0].name) + '.rb\'');
+      }
+
       codeWriter.writeLine();
     }
 
