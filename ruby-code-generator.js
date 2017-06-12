@@ -299,7 +299,10 @@ define(function (require, exports, module) {
         codeWriter.writeLine('# TODO(person name): Implement this method here.');
         codeWriter.outdent();
         codeWriter.writeLine('end');
-        codeWriter.writeLine();
+
+        if (i !== len - 1) {
+          codeWriter.writeLine();
+        }
       }
     }
   };
