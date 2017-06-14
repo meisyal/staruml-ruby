@@ -53,7 +53,7 @@ define(function (require, exports, module) {
     } else if (element instanceof type.UMLClass) {
       if (element.stereotype !== 'annotationType') {
         codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
-        var moduleName = this.writePackage(codeWriter, element);
+        var moduleName = this.getPackageName(element);
         if (moduleName) {
           this.writeDocumentation(codeWriter, element._parent.documentation, options);
           codeWriter.writeLine('module ' + moduleName);
@@ -70,6 +70,13 @@ define(function (require, exports, module) {
         file = FileSystem.getFileForPath(fullPath);
         FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
       }
+    } else if (element instanceof type.UMLInterface) {
+      codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
+      this.writeInterface(codeWriter, element, options)
+
+      fullPath = path + '/' + codeWriter.fileName(element.name) + '.rb';
+      file = FileSystem.getFileForPath(fullPath);
+      FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
     } else {
       result.resolve();
     }
@@ -90,7 +97,7 @@ define(function (require, exports, module) {
     return null;
   };
 
-  RubyCodeGenerator.prototype.writePackage = function (codeWriter, element) {
+  RubyCodeGenerator.prototype.getPackageName = function (element) {
     var path = null;
 
     if (element._parent) {
@@ -109,6 +116,16 @@ define(function (require, exports, module) {
 
     return _.map(inheritances, function (inherit) {
       return inherit.target;
+    });
+  };
+
+  RubyCodeGenerator.prototype.getInterface = function (element) {
+    var interfaces = Repository.getRelationshipsOf(element, function (relationship) {
+      return (relationship instanceof type.UMLInterfaceRealization && relationship.source === element);
+    });
+
+    return _.map(interfaces, function (implement) {
+      return implement.target;
     });
   };
 
@@ -282,7 +299,10 @@ define(function (require, exports, module) {
         codeWriter.writeLine('# TODO(person name): Implement this method here.');
         codeWriter.outdent();
         codeWriter.writeLine('end');
-        codeWriter.writeLine();
+
+        if (i !== len - 1) {
+          codeWriter.writeLine();
+        }
       }
     }
   };
@@ -439,11 +459,35 @@ define(function (require, exports, module) {
     codeWriter.writeLine('end');
   };
 
+  RubyCodeGenerator.prototype.writeInterface = function (codeWriter, element, options) {
+    var terms = [];
+
+    terms.push('module');
+    terms.push(element.name);
+
+    codeWriter.writeLine(terms.join(' '));
+    this.writeMethodByVisibility(codeWriter, element, options);
+    codeWriter.writeLine('end');
+  };
+
   RubyCodeGenerator.prototype.writeClass = function (codeWriter, element, options) {
     var terms = [];
     var staticAttributeCount = this.countStaticAttribute(element);
 
     this.writeAssociation(codeWriter, element);
+
+    var _interface = this.getInterface(element);
+    if (_interface.length) {
+      var packageName = this.getPackageName(_interface[0]);
+
+      if (packageName) {
+        codeWriter.writeLine('require_relative \'' + codeWriter.fileName(packageName) + '/' + codeWriter.fileName(_interface[0].name) + '.rb\'');
+      } else {
+        codeWriter.writeLine('require_relative \'' + codeWriter.fileName(_interface[0].name) + '.rb\'');
+      }
+
+      codeWriter.writeLine();
+    }
 
     this.writeDocumentation(codeWriter, element.documentation, options);
     terms.push('class');
@@ -456,6 +500,11 @@ define(function (require, exports, module) {
 
     codeWriter.writeLine(terms.join(' '));
     codeWriter.indent();
+
+    if (_interface.length) {
+      codeWriter.writeLine('include ' + _interface[0].name);
+      codeWriter.writeLine();
+    }
 
     var associations = this.getClassAssociation(codeWriter, element);
     var associationTerms = [];
