@@ -39,7 +39,8 @@ define(function (require, exports, module) {
     var file;
 
     if (element instanceof type.UMLPackage) {
-      fullPath = path + '/' + element.name;
+      codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
+      fullPath = path + '/' + codeWriter.fileName(element.name);
       directory = FileSystem.getDirectoryForPath(fullPath);
       directory.create(function (error, stat) {
         if (!error) {
