@@ -35,11 +35,11 @@ define(function (require, exports, module) {
     var _this = this;
     var fullPath;
     var directory;
-    var codeWriter;
+    var codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
     var file;
 
     if (element instanceof type.UMLPackage) {
-      fullPath = path + '/' + element.name;
+      fullPath = path + '/' + codeWriter.fileName(element.name);
       directory = FileSystem.getDirectoryForPath(fullPath);
       directory.create(function (error, stat) {
         if (!error) {
@@ -52,8 +52,8 @@ define(function (require, exports, module) {
       });
     } else if (element instanceof type.UMLClass) {
       if (element.stereotype !== 'annotationType') {
-        codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
         var moduleName = this.getPackageName(element);
+
         if (moduleName) {
           this.writeDocumentation(codeWriter, element._parent.documentation, options);
           codeWriter.writeLine('module ' + moduleName);
@@ -61,6 +61,7 @@ define(function (require, exports, module) {
         }
 
         this.writeClass(codeWriter, element, options);
+
         if (moduleName) {
           codeWriter.outdent();
           codeWriter.writeLine('end');
@@ -71,7 +72,6 @@ define(function (require, exports, module) {
         FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
       }
     } else if (element instanceof type.UMLInterface) {
-      codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
       this.writeInterface(codeWriter, element, options)
 
       fullPath = path + '/' + codeWriter.fileName(element.name) + '.rb';
