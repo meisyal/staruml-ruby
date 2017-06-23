@@ -119,6 +119,14 @@ define(function (require, exports, module) {
     });
   };
 
+  RubyCodeGenerator.prototype.getAssociation = function (element) {
+    var associations = Repository.getRelationshipsOf(element, function (relationship) {
+      return (relationship instanceof type.UMLAssociation);
+    });
+
+    return associations;
+  }
+
   RubyCodeGenerator.prototype.getInterface = function (element) {
     var interfaces = Repository.getRelationshipsOf(element, function (relationship) {
       return (relationship instanceof type.UMLInterfaceRealization && relationship.source === element);
@@ -130,9 +138,7 @@ define(function (require, exports, module) {
   };
 
   RubyCodeGenerator.prototype.writeAssociation = function (codeWriter, element) {
-    var associations = Repository.getRelationshipsOf(element, function (relationship) {
-      return (relationship instanceof type.UMLAssociation);
-    });
+    var associations = this.getAssociation(element);
 
     for (var i = 0; i < associations.length; i++) {
       var association = associations[i];
@@ -430,10 +436,7 @@ define(function (require, exports, module) {
 
   RubyCodeGenerator.prototype.getClassAssociation = function (codeWriter, element) {
     var classAssociations = [];
-
-    var associations = Repository.getRelationshipsOf(element, function (relationship) {
-      return (relationship instanceof type.UMLAssociation);
-    });
+    var associations = this.getAssociation(element);
 
     for (var i = 0; i < associations.length; i++) {
       var association = associations[i];
