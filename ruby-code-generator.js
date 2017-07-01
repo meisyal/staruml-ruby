@@ -144,15 +144,25 @@ define(function (require, exports, module) {
       var association = associations[i];
 
       if (association.end1.reference === element && association.end2.navigable === true) {
+        var packageName = codeWriter.fileName(this.getPackageName(association.end2.reference));
         var fileName = codeWriter.fileName(association.end2.reference.name);
 
-        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+        if (packageName) {
+          codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'');
+        } else {
+          codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+        }
       }
 
       if (association.end2.reference === element && association.end1.navigable === true) {
+        var packageName = codeWriter.fileName(this.getPackageName(association.end1.reference));
         var fileName = codeWriter.fileName(association.end1.reference.name);
 
-        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+        if (packageName) {
+          codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'');
+        } else {
+          codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+        }
       }
     }
 
