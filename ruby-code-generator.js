@@ -491,12 +491,13 @@ define(function (require, exports, module) {
 
     var _interface = this.getInterface(element);
     if (_interface.length) {
-      var packageName = this.getPackageName(_interface[0]);
+      var packageName = codeWriter.fileName(this.getPackageName(_interface[0]));
+      var fileName = codeWriter.fileName(_interface[0].name);
 
       if (packageName) {
-        codeWriter.writeLine('require_relative \'' + codeWriter.fileName(packageName) + '/' + codeWriter.fileName(_interface[0].name) + '.rb\'');
+        codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'');
       } else {
-        codeWriter.writeLine('require_relative \'' + codeWriter.fileName(_interface[0].name) + '.rb\'');
+        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
       }
 
       codeWriter.writeLine();
