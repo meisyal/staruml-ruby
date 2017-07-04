@@ -54,6 +54,8 @@ define(function (require, exports, module) {
       if (element.stereotype !== 'annotationType') {
         var moduleName = this.getPackageName(element);
 
+        this.writeAssociation(codeWriter, element);
+
         if (moduleName) {
           this.writeDocumentation(codeWriter, element._parent.documentation, options);
           codeWriter.writeLine('module ' + moduleName);
@@ -486,8 +488,6 @@ define(function (require, exports, module) {
   RubyCodeGenerator.prototype.writeClass = function (codeWriter, element, options) {
     var terms = [];
     var staticAttributeCount = this.countStaticAttribute(element);
-
-    this.writeAssociation(codeWriter, element);
 
     var _interface = this.getInterface(element);
     if (_interface.length) {
