@@ -54,12 +54,13 @@ define(function (require, exports, module) {
       if (element.stereotype !== 'annotationType') {
         var moduleName = this.getPackageName(element);
 
-        this.writeAssociation(codeWriter, element);
-
         if (moduleName) {
+          this.writeAssociation(codeWriter, element, true);
           this.writeDocumentation(codeWriter, element._parent.documentation, options);
           codeWriter.writeLine('module ' + moduleName);
           codeWriter.indent();
+        } else {
+          this.writeAssociation(codeWriter, element, false);
         }
 
         this.writeClass(codeWriter, element, options);
@@ -139,7 +140,7 @@ define(function (require, exports, module) {
     });
   };
 
-  RubyCodeGenerator.prototype.writeAssociation = function (codeWriter, element) {
+  RubyCodeGenerator.prototype.writeAssociation = function (codeWriter, element, isInModule) {
     var associations = this.getAssociation(element);
 
     for (var i = 0; i < associations.length; i++) {
@@ -151,6 +152,8 @@ define(function (require, exports, module) {
 
         if (packageName) {
           codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'');
+        } else if (isInModule) {
+          codeWriter.writeLine('require_relative \'../' + fileName + '.rb\'');
         } else {
           codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
         }
@@ -162,6 +165,8 @@ define(function (require, exports, module) {
 
         if (packageName) {
           codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'');
+        } else if (isInModule) {
+          codeWriter.writeLine('require_relative \'../' + fileName + '.rb\'');
         } else {
           codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
         }
