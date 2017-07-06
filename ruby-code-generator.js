@@ -55,9 +55,12 @@ define(function (require, exports, module) {
         var moduleName = this.getPackageName(element);
 
         if (moduleName) {
+          this.writeAssociation(codeWriter, element, true);
           this.writeDocumentation(codeWriter, element._parent.documentation, options);
           codeWriter.writeLine('module ' + moduleName);
           codeWriter.indent();
+        } else {
+          this.writeAssociation(codeWriter, element, false);
         }
 
         this.writeClass(codeWriter, element, options);
@@ -119,6 +122,14 @@ define(function (require, exports, module) {
     });
   };
 
+  RubyCodeGenerator.prototype.getAssociation = function (element) {
+    var associations = Repository.getRelationshipsOf(element, function (relationship) {
+      return (relationship instanceof type.UMLAssociation);
+    });
+
+    return associations;
+  }
+
   RubyCodeGenerator.prototype.getInterface = function (element) {
     var interfaces = Repository.getRelationshipsOf(element, function (relationship) {
       return (relationship instanceof type.UMLInterfaceRealization && relationship.source === element);
@@ -129,24 +140,36 @@ define(function (require, exports, module) {
     });
   };
 
-  RubyCodeGenerator.prototype.writeAssociation = function (codeWriter, element) {
-    var associations = Repository.getRelationshipsOf(element, function (relationship) {
-      return (relationship instanceof type.UMLAssociation);
-    });
+  RubyCodeGenerator.prototype.writeAssociation = function (codeWriter, element, isInModule) {
+    var associations = this.getAssociation(element);
 
     for (var i = 0; i < associations.length; i++) {
       var association = associations[i];
 
       if (association.end1.reference === element && association.end2.navigable === true) {
+        var packageName = codeWriter.fileName(this.getPackageName(association.end2.reference));
         var fileName = codeWriter.fileName(association.end2.reference.name);
 
-        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+        if (packageName) {
+          codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'');
+        } else if (isInModule) {
+          codeWriter.writeLine('require_relative \'../' + fileName + '.rb\'');
+        } else {
+          codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+        }
       }
 
       if (association.end2.reference === element && association.end1.navigable === true) {
+        var packageName = codeWriter.fileName(this.getPackageName(association.end1.reference));
         var fileName = codeWriter.fileName(association.end1.reference.name);
 
-        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+        if (packageName) {
+          codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'');
+        } else if (isInModule) {
+          codeWriter.writeLine('require_relative \'../' + fileName + '.rb\'');
+        } else {
+          codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+        }
       }
     }
 
@@ -430,10 +453,7 @@ define(function (require, exports, module) {
 
   RubyCodeGenerator.prototype.getClassAssociation = function (codeWriter, element) {
     var classAssociations = [];
-
-    var associations = Repository.getRelationshipsOf(element, function (relationship) {
-      return (relationship instanceof type.UMLAssociation);
-    });
+    var associations = this.getAssociation(element);
 
     for (var i = 0; i < associations.length; i++) {
       var association = associations[i];
@@ -474,16 +494,15 @@ define(function (require, exports, module) {
     var terms = [];
     var staticAttributeCount = this.countStaticAttribute(element);
 
-    this.writeAssociation(codeWriter, element);
-
     var _interface = this.getInterface(element);
     if (_interface.length) {
-      var packageName = this.getPackageName(_interface[0]);
+      var packageName = codeWriter.fileName(this.getPackageName(_interface[0]));
+      var fileName = codeWriter.fileName(_interface[0].name);
 
       if (packageName) {
-        codeWriter.writeLine('require_relative \'' + codeWriter.fileName(packageName) + '/' + codeWriter.fileName(_interface[0].name) + '.rb\'');
+        codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'');
       } else {
-        codeWriter.writeLine('require_relative \'' + codeWriter.fileName(_interface[0].name) + '.rb\'');
+        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
       }
 
       codeWriter.writeLine();
