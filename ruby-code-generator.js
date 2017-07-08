@@ -494,6 +494,14 @@ define(function (require, exports, module) {
     var terms = [];
     var staticAttributeCount = this.countStaticAttribute(element);
 
+    var _inheritance = this.getSuperClasses(element);
+    if (_inheritance.length) {
+      var fileName = codeWriter.fileName(_inheritance[0].name);
+
+      codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+      codeWriter.writeLine();
+    }
+
     var _interface = this.getInterface(element);
     if (_interface.length) {
       var packageName = codeWriter.fileName(this.getPackageName(_interface[0]));
@@ -512,7 +520,6 @@ define(function (require, exports, module) {
     terms.push('class');
     terms.push(element.name);
 
-    var _inheritance = this.getSuperClasses(element);
     if (_inheritance.length) {
       terms.push('< ' + _inheritance[0].name);
     }
