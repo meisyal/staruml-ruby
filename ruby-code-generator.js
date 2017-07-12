@@ -35,11 +35,11 @@ define(function (require, exports, module) {
     var _this = this;
     var fullPath;
     var directory;
-    var codeWriter;
+    var codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
     var file;
 
     if (element instanceof type.UMLPackage) {
-      fullPath = path + '/' + element.name;
+      fullPath = path + '/' + codeWriter.fileName(element.name);
       directory = FileSystem.getDirectoryForPath(fullPath);
       directory.create(function (error, stat) {
         if (!error) {
@@ -52,15 +52,19 @@ define(function (require, exports, module) {
       });
     } else if (element instanceof type.UMLClass) {
       if (element.stereotype !== 'annotationType') {
-        codeWriter = new CodeGenUtils.CodeWriter(this.getIndentString(options));
-        var moduleName = this.writePackage(codeWriter, element);
+        var moduleName = this.getPackageName(element);
+
         if (moduleName) {
+          this.writeAssociation(codeWriter, element, true);
           this.writeDocumentation(codeWriter, element._parent.documentation, options);
           codeWriter.writeLine('module ' + moduleName);
           codeWriter.indent();
+        } else {
+          this.writeAssociation(codeWriter, element, false);
         }
 
         this.writeClass(codeWriter, element, options);
+
         if (moduleName) {
           codeWriter.outdent();
           codeWriter.writeLine('end');
@@ -70,6 +74,12 @@ define(function (require, exports, module) {
         file = FileSystem.getFileForPath(fullPath);
         FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
       }
+    } else if (element instanceof type.UMLInterface) {
+      this.writeInterface(codeWriter, element, options)
+
+      fullPath = path + '/' + codeWriter.fileName(element.name) + '.rb';
+      file = FileSystem.getFileForPath(fullPath);
+      FileUtils.writeText(file, codeWriter.getData(), true).then(result.resolve, result.reject);
     } else {
       result.resolve();
     }
@@ -90,7 +100,7 @@ define(function (require, exports, module) {
     return null;
   };
 
-  RubyCodeGenerator.prototype.writePackage = function (codeWriter, element) {
+  RubyCodeGenerator.prototype.getPackageName = function (element) {
     var path = null;
 
     if (element._parent) {
@@ -112,24 +122,54 @@ define(function (require, exports, module) {
     });
   };
 
-  RubyCodeGenerator.prototype.writeAssociation = function (codeWriter, element) {
+  RubyCodeGenerator.prototype.getAssociation = function (element) {
     var associations = Repository.getRelationshipsOf(element, function (relationship) {
       return (relationship instanceof type.UMLAssociation);
     });
+
+    return associations;
+  }
+
+  RubyCodeGenerator.prototype.getInterface = function (element) {
+    var interfaces = Repository.getRelationshipsOf(element, function (relationship) {
+      return (relationship instanceof type.UMLInterfaceRealization && relationship.source === element);
+    });
+
+    return _.map(interfaces, function (implement) {
+      return implement.target;
+    });
+  };
+
+  RubyCodeGenerator.prototype.writeAssociation = function (codeWriter, element, isInModule) {
+    var associations = this.getAssociation(element);
 
     for (var i = 0; i < associations.length; i++) {
       var association = associations[i];
 
       if (association.end1.reference === element && association.end2.navigable === true) {
+        var packageName = codeWriter.fileName(this.getPackageName(association.end2.reference));
         var fileName = codeWriter.fileName(association.end2.reference.name);
 
-        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+        if (packageName) {
+          codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'');
+        } else if (isInModule) {
+          codeWriter.writeLine('require_relative \'../' + fileName + '.rb\'');
+        } else {
+          codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+        }
       }
 
       if (association.end2.reference === element && association.end1.navigable === true) {
+        var packageName = codeWriter.fileName(this.getPackageName(association.end1.reference));
         var fileName = codeWriter.fileName(association.end1.reference.name);
 
-        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+        if (packageName) {
+          codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'');
+        } else if (isInModule) {
+          codeWriter.writeLine('require_relative \'../' + fileName + '.rb\'');
+        } else {
+          codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+        }
       }
     }
 
@@ -282,7 +322,10 @@ define(function (require, exports, module) {
         codeWriter.writeLine('# TODO(person name): Implement this method here.');
         codeWriter.outdent();
         codeWriter.writeLine('end');
-        codeWriter.writeLine();
+
+        if (i !== len - 1) {
+          codeWriter.writeLine();
+        }
       }
     }
   };
@@ -410,10 +453,7 @@ define(function (require, exports, module) {
 
   RubyCodeGenerator.prototype.getClassAssociation = function (codeWriter, element) {
     var classAssociations = [];
-
-    var associations = Repository.getRelationshipsOf(element, function (relationship) {
-      return (relationship instanceof type.UMLAssociation);
-    });
+    var associations = this.getAssociation(element);
 
     for (var i = 0; i < associations.length; i++) {
       var association = associations[i];
@@ -439,23 +479,58 @@ define(function (require, exports, module) {
     codeWriter.writeLine('end');
   };
 
+  RubyCodeGenerator.prototype.writeInterface = function (codeWriter, element, options) {
+    var terms = [];
+
+    terms.push('module');
+    terms.push(element.name);
+
+    codeWriter.writeLine(terms.join(' '));
+    this.writeMethodByVisibility(codeWriter, element, options);
+    codeWriter.writeLine('end');
+  };
+
   RubyCodeGenerator.prototype.writeClass = function (codeWriter, element, options) {
     var terms = [];
     var staticAttributeCount = this.countStaticAttribute(element);
 
-    this.writeAssociation(codeWriter, element);
+    var _inheritance = this.getSuperClasses(element);
+    if (_inheritance.length) {
+      var fileName = codeWriter.fileName(_inheritance[0].name);
+
+      codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+      codeWriter.writeLine();
+    }
+
+    var _interface = this.getInterface(element);
+    if (_interface.length) {
+      var packageName = codeWriter.fileName(this.getPackageName(_interface[0]));
+      var fileName = codeWriter.fileName(_interface[0].name);
+
+      if (packageName) {
+        codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'');
+      } else {
+        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'');
+      }
+
+      codeWriter.writeLine();
+    }
 
     this.writeDocumentation(codeWriter, element.documentation, options);
     terms.push('class');
     terms.push(element.name);
 
-    var _inheritance = this.getSuperClasses(element);
     if (_inheritance.length) {
       terms.push('< ' + _inheritance[0].name);
     }
 
     codeWriter.writeLine(terms.join(' '));
     codeWriter.indent();
+
+    if (_interface.length) {
+      codeWriter.writeLine('include ' + _interface[0].name);
+      codeWriter.writeLine();
+    }
 
     var associations = this.getClassAssociation(codeWriter, element);
     var associationTerms = [];

@@ -42,8 +42,6 @@ Prepare your model that contains a UML class diagram and then:
 3. Select a location where the generated code will be stored.
 4. Press **Open** button.
 
-Your Ruby code is generated. :yay:
-
 ## Configuration
 
 You can configure the extension before generating the code. The configuration
