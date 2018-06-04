@@ -1,6 +1,6 @@
 # staruml-ruby
 
-staruml-ruby is a Ruby extension for [StarUML][staruml] 2. This extension helps
+staruml-ruby is a Ruby extension for [StarUML][staruml]. This extension helps
 you to generate Ruby code from a UML class diagram.
 
 ## Current Status
