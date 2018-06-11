@@ -1,0 +1,20 @@
+{
+  "menu": [
+    {
+      "id": "tools",
+      "submenu": [
+        {
+          "label": "Ruby",
+          "id": "tools.ruby",
+          "submenu": [
+            {
+              { "label": "Generator Code...", "id": "tools.ruby.generate", "command": "ruby:generate" },
+              { "type": "separator" },
+              { "label": "Configure...", "id": "tools.ruby.configure", "command": "ruby:configure" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
