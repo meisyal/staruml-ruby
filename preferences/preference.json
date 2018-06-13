@@ -1,0 +1,40 @@
+{
+  "id": "ruby",
+  "name": "Ruby",
+  "schema": {
+    "ruby.generator": {
+      "text": "Ruby Code Generation",
+      "type": "section"
+    },
+    "ruby.generator.useTab": {
+      "text": "Use Tab",
+      "description": "Use tab for indentation instead of spaces.",
+      "type": "check",
+      "default": false
+    },
+    "ruby.generator.indentSpaces": {
+      "text": "Indent Spaces",
+      "description": "Number of spaces for indentation.",
+      "type": "number",
+      "default": 2
+    },
+    "ruby.generator.initializeMethod": {
+      "text": "The initialize method",
+      "description": "Generate initialize method that works almost same way as constructor.",
+      "type": "check",
+      "default": true
+    },
+    "ruby.generator.toStringMethod": {
+      "text": "The to_s method",
+      "description": "Generate to_s method that returns a string representation of the object.",
+      "type": "check",
+      "default": true
+    },
+    "ruby.generator.documentation": {
+      "text": "Documentation",
+      "description": "Generate documentation of class elements.",
+      "type": "Check",
+      "default": true
+    }
+  }
+}
