@@ -1,68 +1,89 @@
-define(function (require, exports, module) {
-  'use strict';
+/*
+ * Copyright (c) 2016-2018 Andrias Meisyal. All rights reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
-  var Commands = app.getModule('command/Commands');
-  var CommandManager = app.getModule('command/CommandManager');
-  var MenuManager = app.getModule('menu/MenuManager');
-  var Dialogs = app.getModule('dialogs/Dialogs');
-  var ElementPickerDialog = app.getModule('dialogs/ElementPickerDialog');
-  var FileSystem = app.getModule('filesystem/FileSystem');
+const RubyCodeGenerator = require('./ruby-code-generator')
 
-  var CodeGenUtils = require('code-generator-utils');
-  var RubyCodeGenerator = require('ruby-code-generator');
-  var RubyPreferences = require('ruby-preferences');
+function getGeneratorOptions () {
+  return {
+    useTab: app.preferences.get('ruby.generator.useTab'),
+    indentSpaces: app.preferences.get('ruby.generator.indentSpaces'),
+    initializeMethod: app.preferences.get('ruby.generator.initiliazeMethod'),
+    toStringMethod: app.preferences.get('ruby.generator.toStringMethod'),
+    documentation: app.preferences.get('ruby.generator.documentation')
+  }
+}
 
-  var CMD_RUBY = 'ruby';
-  var CMD_RUBY_GENERATE = 'ruby.generate';
-  var CMD_RUBY_CONFIGURE = 'ruby.configure';
-
-  function _handleGenerate(base, path, options) {
-    var result = new $.Deferred();
-    options = options || RubyPreferences.getGenerateOptions();
-
-    if (!base) {
-      ElementPickerDialog.showDialog('Select a base model to generate codes', null, type.UMLPackage)
-        .done(function (buttonId, selected) {
-          if (buttonId === Dialogs.DIALOG_BTN_OK && selected) {
-            base = selected;
-            if (!path) {
-              FileSystem.showOpenDialog(false, true, 'Select a folder where generated codes to be located', null, null, function (error, files) {
-                if (!error) {
-                  if (files) {
-                    path = files[0];
-                    RubyCodeGenerator.generate(base, path, options).then(result.resolve, result.reject);
-                  } else {
-                    result.reject(FileSystem.USER_CANCELED);
-                  }
-                } else {
-                  result.reject(error);
-                }
-              });
-            } else {
-              RubyCodeGenerator.generate(base, path, options).then(result.resolve, result.reject);
-            }
-          } else {
-            result.reject();
+/*
+ * Command Handler for Ruby Generate
+ *
+ * @param {Element} base
+ * @param {string} path
+ * @param {Object} options
+ * @return {$.Promise}
+ */
+function _handleGenerate (base, path, options) {
+  // If options is not passed, get from preference
+  options = options || getGeneratorOptions()
+  // If base is not assigned, popup ElementPicker
+  if (!base) {
+    app.elementPickerDialog.showDialog('Select a base model to generate codes', null, type.UMLPackage).then(function ({buttonId, returnValue}) {
+      if (buttonId === 'ok') {
+        base = returnValue
+        // If path is not assigned, popup Open Dialog to select a folder
+        if (!path) {
+          var files = app.dialogs.showOpenDialog('Select a folder where generated codes to be located', null, null, { properties: ['openDirectory']})
+          if (files && files.length > 0) {
+            path = files[0]
+            RubyCodeGenerator.generate(base, path, options)
           }
-      });
+        } else {
+          RubyCodeGenerator.generate(base, path, options)
+        }
+      }
+    })
+  } else {
+    // If path is not assigned, popup Open Dialog to select a folder
+    if (!path) {
+      var files = app.dialogs.showOpenDialog('Select a folder where generated codes to be located', null, null, { properties: ['openDirectory']})
+      if (files && files.length > 0) {
+        path = files[0]
+        RubyCodeGenerator.generate(base, path, options)
+      }
     } else {
-      window.alert('NotImplementedError');
+        RubyCodeGenerator.generate(base, path, options)
     }
-
-    return result.promise();
   }
+}
 
-  function _handleConfigure() {
-    CommandManager.execute(Commands.FILE_PREFERENCES, RubyPreferences.getId());
-  }
+/*
+ * Popup PreferenceDialog with Ruby Preference Schema
+ */
+function _handleConfigure () {
+  app.commands.execute('application:preferences', 'ruby')
+}
 
-  CommandManager.register('Ruby', CMD_RUBY, CommandManager.doNothing);
-  CommandManager.register('Generate Code...', CMD_RUBY_GENERATE, _handleGenerate);
-  CommandManager.register('Configure...', CMD_RUBY_CONFIGURE, _handleConfigure);
+function init () {
+  app.commands.register('ruby:generate', _handleGenerate)
+  app.commands.register('ruby:configure', _handleConfigure)
+}
 
-  var menu = MenuManager.getMenu(Commands.TOOLS);
-  var menuItem = menu.addMenuItem(CMD_RUBY);
-  menuItem.addMenuItem(CMD_RUBY_GENERATE);
-  menuItem.addMenuDivider();
-  menuItem.addMenuItem(CMD_RUBY_CONFIGURE);
-});
+exports.init = init
