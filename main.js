@@ -69,7 +69,7 @@ function _handleGenerate (base, path, options) {
         RubyCodeGenerator.generate(base, path, options)
       }
     } else {
-        RubyCodeGenerator.generate(base, path, options)
+      RubyCodeGenerator.generate(base, path, options)
     }
   }
 }
