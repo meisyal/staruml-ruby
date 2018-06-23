@@ -33,7 +33,7 @@
     "ruby.generator.documentation": {
       "text": "Documentation",
       "description": "Generate documentation of class elements.",
-      "type": "Check",
+      "type": "check",
       "default": true
     }
   }
