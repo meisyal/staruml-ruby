@@ -26,7 +26,7 @@ function getGeneratorOptions () {
   return {
     useTab: app.preferences.get('ruby.generator.useTab'),
     indentSpaces: app.preferences.get('ruby.generator.indentSpaces'),
-    initializeMethod: app.preferences.get('ruby.generator.initiliazeMethod'),
+    initializeMethod: app.preferences.get('ruby.generator.initializeMethod'),
     toStringMethod: app.preferences.get('ruby.generator.toStringMethod'),
     documentation: app.preferences.get('ruby.generator.documentation')
   }

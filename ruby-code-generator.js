@@ -703,7 +703,7 @@ class RubyCodeGenerator {
     codeWriter.outdent()
     this.writeMethodByVisibility(codeWriter, element, options)
 
-    if (options.rubyToStringMethod) {
+    if (options.toStringMethod) {
       this.writeToStringMethod(codeWriter)
     }
 
