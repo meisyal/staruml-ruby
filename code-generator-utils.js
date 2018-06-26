@@ -1,41 +1,96 @@
-define(function (require, exports, module) {
-  'use strict';
+/*
+ * Copyright (c) 2016-2018 Andrias Meisyal. All rights reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
-  function CodeWriter(indentString) {
-    this.lines = [];
-    this.indentString = (indentString ? indentString : '  ');
-    this.indentations = [];
+/*
+ * CodeWriter
+ */
+class CodeWriter {
+  /*
+   * @constructor
+   *
+   * @param {string} indentString
+   */
+  constructor (indentString) {
+    // @member {Array.<string>} lines
+    this.lines = []
+    // @member {string} indentString
+    this.indentString = indentString || '    ' // default 4 spaces
+    // @member {Array.<string>} indentations
+    this.indentations = []
   }
 
-  CodeWriter.prototype.indent = function () {
-    this.indentations.push(this.indentString);
-  };
+  /*
+   * Indent
+   */
+  indent () {
+    this.indentations.push(this.indentString)
+  }
 
-  CodeWriter.prototype.outdent = function () {
-    this.indentations.splice(this.indentations.length - 1, 1);
-  };
+  /*
+   * Outdent
+   */
+  outdent () {
+    this.indentations.splice(this.indentations.length - 1, 1)
+  }
 
-  CodeWriter.prototype.writeLine = function (line) {
+  /*
+   * Write a line
+   * @param {string} line
+   */
+  writeLine (line) {
     if (line) {
-      this.lines.push(this.indentations.join('') + line);
+      this.lines.push(this.indentations.join('') + line)
     } else {
-      this.lines.push('');
+      this.lines.push('')
     }
-  };
+  }
 
-  CodeWriter.prototype.getData = function () {
-    return this.lines.join('\n');
-  };
+  /*
+   * Return as all string data
+   * @return {string} line
+   */
+  getData () {
+    return this.lines.join('\n')
+  }
 
-  CodeWriter.prototype.fileName = function (className) {
-    return className.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
-  };
+  /*
+   * Return file name by converting class name to snack case
+   * @param {string} class name
+   * @return {string} file name
+   */
+  getFileName (className) {
+    return className.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()
+  }
 
-  CodeWriter.prototype.toCamelCase = function (className) {
+  /*
+   * Convert class name to camel case
+   * @param {string} class name
+   * @return {string} converted class name
+   */
+  toCamelCase (className) {
     return className.replace(/(\b|_)\w/g, function (match) {
-      return match.replace(/_/, '').toUpperCase();
-    });
-  };
+      return match.replace(/_/, '').toUpperCase()
+    })
+  }
+}
 
-  exports.CodeWriter = CodeWriter;
-});
+exports.CodeWriter = CodeWriter
