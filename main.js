@@ -32,6 +32,18 @@ function getGeneratorOptions () {
   }
 }
 
+function showOpenDialog(base, path, options) {
+  if (!path) {
+    var files = app.dialogs.showOpenDialog('Select a folder where generated codes to be located', null, null, { properties: ['openDirectory']})
+    if (files && files.length > 0) {
+      path = files[0]
+      RubyCodeGenerator.generate(base, path, options)
+    }
+  } else {
+    RubyCodeGenerator.generate(base, path, options)
+  }
+}
+
 /*
  * Command Handler for Ruby Generate
  *
@@ -48,28 +60,13 @@ function _handleGenerate (base, path, options) {
     app.elementPickerDialog.showDialog('Select a base model to generate codes', null, type.UMLPackage).then(function ({buttonId, returnValue}) {
       if (buttonId === 'ok') {
         base = returnValue
-        // If path is not assigned, popup Open Dialog to select a folder
-        if (!path) {
-          var files = app.dialogs.showOpenDialog('Select a folder where generated codes to be located', null, null, { properties: ['openDirectory']})
-          if (files && files.length > 0) {
-            path = files[0]
-            RubyCodeGenerator.generate(base, path, options)
-          }
-        } else {
-          RubyCodeGenerator.generate(base, path, options)
-        }
+        showOpenDialog(base, path, options)
       }
     })
   } else {
     // If path is not assigned, popup Open Dialog to select a folder
     if (!path) {
-      var files = app.dialogs.showOpenDialog('Select a folder where generated codes to be located', null, null, { properties: ['openDirectory']})
-      if (files && files.length > 0) {
-        path = files[0]
-        RubyCodeGenerator.generate(base, path, options)
-      }
-    } else {
-      RubyCodeGenerator.generate(base, path, options)
+      showOpenDialog(base, path, options)
     }
   }
 }
