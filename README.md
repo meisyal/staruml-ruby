@@ -54,7 +54,6 @@ See [Installation][installation] for other installation methods.
 
 ## Usage
 
-When this extension is successfully installed, it's time to use the extension.
 Prepare your model that contains a UML class diagram and then:
 
 1. Click **Tools** -> **Ruby** -> **Generate Code...** on the menu bar of
@@ -89,6 +88,8 @@ This extension is released under the terms of MIT License. See the
 [LICENSE][license] file for more details.
 
 Copyright &copy; 2016-2018 Andrias Meisyal.
+
+
 
 [staruml]: http://staruml.io
 [umlconcept]:
