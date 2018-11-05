@@ -69,11 +69,39 @@ class RubyCodeGenerator {
   generate (element, basePath, options) {
     var fullPath
     var codeWriter = new codegenutils.CodeWriter(this.getIndentString(options))
+    var deleteFolderRecursive = function (path) {
+      if (filesystem.existsSync(path)) {
+        filesystem.readdirSync(path).forEach(function (file, index) {
+          var currentPath = path + '/' + file
+
+          if (filesystem.lstatSync(currentPath).isDirectory()) {
+            deleteFolderRecursive(currentPath)
+          } else {
+            filesystem.unlinkSync(currentPath)
+          }
+        })
+
+        filesystem.rmdirSync(path)
+      }
+    }
 
     // UML Package
     if (element instanceof type.UMLPackage) {
       fullPath = path.join(basePath, element.name)
-      filesystem.mkdirSync(fullPath)
+
+      if (!filesystem.existsSync(fullPath)) {
+        filesystem.mkdirSync(fullPath)
+      } else {
+        var buttonId = app.dialogs.showConfirmDialog('A folder with same name already exists, do you want to overwrite?')
+        if (buttonId === 'ok') {
+          deleteFolderRecursive(fullPath)
+          filesystem.mkdirSync(fullPath)
+          app.dialogs.showInfoDialog('A folder overwritten.')
+        } else {
+          app.dialogs.showErrorDialog('Operation is cancelled by user.')
+        }
+      }
+
       if (Array.isArray(element.ownedElements)) {
         element.ownedElements.forEach(child => {
           return this.generate(child, fullPath, options)

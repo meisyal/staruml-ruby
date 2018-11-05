@@ -1,7 +1,29 @@
 # staruml-ruby
 
 staruml-ruby is a Ruby extension for [StarUML][staruml]. This extension helps
-you to generate Ruby code from a UML class diagram.
+you to generate Ruby code from a UML class diagram. For example, you have a
+class called `Book`.
+
+![Book class](https://res.cloudinary.com/daokp8cnd/image/upload/v1540477871/staruml-ruby/book-class.png)
+
+staruml-ruby will generate code below:
+
+```ruby
+class Book
+  def initialize(name, price, qty)
+    @name = name
+    @price = price
+    @qty = qty
+  end
+
+  private
+    attr_accessor :name, :price, :qty
+
+  def to_s
+    "Your string representation of the object will be written here."
+  end
+end
+```
 
 ## Current Status
 
@@ -32,7 +54,6 @@ See [Installation][installation] for other installation methods.
 
 ## Usage
 
-When this extension is successfully installed, it's time to use the extension.
 Prepare your model that contains a UML class diagram and then:
 
 1. Click **Tools** -> **Ruby** -> **Generate Code...** on the menu bar of
@@ -67,6 +88,8 @@ This extension is released under the terms of MIT License. See the
 [LICENSE][license] file for more details.
 
 Copyright &copy; 2016-2018 Andrias Meisyal.
+
+
 
 [staruml]: http://staruml.io
 [umlconcept]:
