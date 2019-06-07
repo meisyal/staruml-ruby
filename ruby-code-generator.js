@@ -299,6 +299,12 @@ class RubyCodeGenerator {
       for (var i = 0; i < len; i++) {
         if (!element.attributes[i].isStatic) {
           terms.push(element.attributes[i].name)
+
+          if (element.attributes[i].defaultValue) {
+            terms.push('=')
+            terms.push(element.attributes[i].defaultValue)
+          }
+
           terms.push(', ')
         }
       }
