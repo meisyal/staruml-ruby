@@ -230,31 +230,23 @@ class RubyCodeGenerator {
 
     for (var i = 0; i < associations.length; i++) {
       var association = associations[i]
+      var packageName
+      var fileName
 
       if (association.end1.reference === element && association.end2.navigable === true) {
-        var packageName = codeWriter.getFileName(this.getPackageName(association.end2.reference))
-        var fileName = codeWriter.getFileName(association.end2.reference.name)
-
-        if (packageName) {
-          codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'')
-        } else if (isInModule) {
-          codeWriter.writeLine('require_relative \'../' + fileName + '.rb\'')
-        } else {
-          codeWriter.writeLine('require_relative \'' + fileName + '.rb\'')
-        }
+        packageName = codeWriter.getFileName(this.getPackageName(association.end2.reference))
+        fileName = codeWriter.getFileName(association.end2.reference.name)
+      } else if (association.end2.reference === element && association.end1.navigable === true) {
+        packageName = codeWriter.getFileName(this.getPackageName(association.end1.reference))
+        fileName = codeWriter.getFileName(association.end1.reference.name)
       }
 
-      if (association.end2.reference === element && association.end1.navigable === true) {
-        var packageName = codeWriter.getFileName(this.getPackageName(association.end1.reference))
-        var fileName = codeWriter.getFileName(association.end1.reference.name)
-
-        if (packageName) {
-          codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'')
-        } else if (isInModule) {
-          codeWriter.writeLine('require_relative \'../' + fileName + '.rb\'')
-        } else {
-          codeWriter.writeLine('require_relative \'' + fileName + '.rb\'')
-        }
+      if (packageName) {
+        codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'')
+      } else if (isInModule) {
+        codeWriter.writeLine('require_relative \'../' + fileName + '.rb\'')
+      } else {
+        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'')
       }
     }
 
