@@ -2496,7 +2496,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFdCNzRcLfSdZY="
 					},
-					"name": "ClassDiagram1",
+					"name": "ClassDiagram",
 					"ownedViews": [
 						{
 							"_type": "UMLClassView",
