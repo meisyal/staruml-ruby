@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018 Andrias Meisyal. All rights reserved.
+ * Copyright (c) 2016-2019 Andrias Meisyal. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -230,31 +230,23 @@ class RubyCodeGenerator {
 
     for (var i = 0; i < associations.length; i++) {
       var association = associations[i]
+      var packageName
+      var fileName
 
       if (association.end1.reference === element && association.end2.navigable === true) {
-        var packageName = codeWriter.getFileName(this.getPackageName(association.end2.reference))
-        var fileName = codeWriter.getFileName(association.end2.reference.name)
-
-        if (packageName) {
-          codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'')
-        } else if (isInModule) {
-          codeWriter.writeLine('require_relative \'../' + fileName + '.rb\'')
-        } else {
-          codeWriter.writeLine('require_relative \'' + fileName + '.rb\'')
-        }
+        packageName = codeWriter.getFileName(this.getPackageName(association.end2.reference))
+        fileName = codeWriter.getFileName(association.end2.reference.name)
+      } else if (association.end2.reference === element && association.end1.navigable === true) {
+        packageName = codeWriter.getFileName(this.getPackageName(association.end1.reference))
+        fileName = codeWriter.getFileName(association.end1.reference.name)
       }
 
-      if (association.end2.reference === element && association.end1.navigable === true) {
-        var packageName = codeWriter.getFileName(this.getPackageName(association.end1.reference))
-        var fileName = codeWriter.getFileName(association.end1.reference.name)
-
-        if (packageName) {
-          codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'')
-        } else if (isInModule) {
-          codeWriter.writeLine('require_relative \'../' + fileName + '.rb\'')
-        } else {
-          codeWriter.writeLine('require_relative \'' + fileName + '.rb\'')
-        }
+      if (packageName) {
+        codeWriter.writeLine('require_relative \'' + packageName + '/' + fileName + '.rb\'')
+      } else if (isInModule) {
+        codeWriter.writeLine('require_relative \'../' + fileName + '.rb\'')
+      } else {
+        codeWriter.writeLine('require_relative \'' + fileName + '.rb\'')
       }
     }
 
@@ -299,6 +291,12 @@ class RubyCodeGenerator {
       for (var i = 0; i < len; i++) {
         if (!element.attributes[i].isStatic) {
           terms.push(element.attributes[i].name)
+
+          if (element.attributes[i].defaultValue) {
+            terms.push('=')
+            terms.push(element.attributes[i].defaultValue)
+          }
+
           terms.push(', ')
         }
       }

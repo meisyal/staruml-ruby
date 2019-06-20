@@ -36,6 +36,6 @@ terms of the [MIT License][license].
 
 [issuetracker]: https://github.com/meisyal/staruml-ruby/issues
 [staruml]: http://staruml.io
-[starumldev]: https://github.com/staruml/staruml-dev-docs/wiki
-[starumlapi]: http://starumldocs-7a0.kxcdn.com/2.0.0/api
+[starumldev]: https://docs.staruml.io/developing-extensions/getting-started
+[starumlapi]: http://staruml.io/reference/3.1.0/api
 [license]: https://github.com/meisyal/staruml-ruby/blob/master/LICENSE

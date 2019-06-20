@@ -4,7 +4,7 @@ staruml-ruby is a Ruby extension for [StarUML][staruml]. This extension helps
 you to generate Ruby code from a UML class diagram. For example, you have a
 class called `Book`.
 
-![Book class](https://res.cloudinary.com/daokp8cnd/image/upload/v1540477871/staruml-ruby/book-class.png)
+![Book class](https://res.cloudinary.com/daokp8cnd/image/upload/c_scale,w_155/v1540477871/staruml-ruby/book-class.png)
 
 staruml-ruby will generate code below:
 
@@ -87,7 +87,7 @@ take a moment to look over the [contributing guidelines][contributing] first.
 This extension is released under the terms of MIT License. See the
 [LICENSE][license] file for more details.
 
-Copyright &copy; 2016-2018 Andrias Meisyal.
+Copyright &copy; 2016-2019 Andrias Meisyal.
 
 
 
