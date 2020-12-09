@@ -91,10 +91,10 @@ Copyright &copy; 2016-2019 Andrias Meisyal.
 
 
 
-[staruml]: http://staruml.io
+[staruml]: https://staruml.io
 [umlconcept]:
 https://github.com/meisyal/staruml-ruby/wiki/Supported-UML-Concepts
-[starumlextension]: http://staruml.io/extensions
+[starumlextension]: https://staruml.io/extensions
 [installation]: https://github.com/meisyal/staruml-ruby/wiki/Installation
 [configuration]: https://github.com/meisyal/staruml-ruby/wiki/Configuration
 [wiki]: https://github.com/meisyal/staruml-ruby/wiki

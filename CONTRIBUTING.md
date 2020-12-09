@@ -35,7 +35,7 @@ By contributing your code, you agree to license your contribution under the
 terms of the [MIT License][license].
 
 [issuetracker]: https://github.com/meisyal/staruml-ruby/issues
-[staruml]: http://staruml.io
+[staruml]: https://staruml.io
 [starumldev]: https://docs.staruml.io/developing-extensions/getting-started
-[starumlapi]: http://staruml.io/reference/3.1.0/api
+[starumlapi]: https://staruml.io/reference/3.1.0/api
 [license]: https://github.com/meisyal/staruml-ruby/blob/master/LICENSE
